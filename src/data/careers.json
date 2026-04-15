@@ -1,0 +1,14 @@
+{
+  "topCareers": [
+    { "id": 1, "title": "AI Engineer", "salary": 7250, "growth": 28, "openings": 3200 },
+    { "id": 2, "title": "Full Stack Dev", "salary": 5500, "growth": 22, "openings": 4800 },
+    { "id": 3, "title": "DevOps", "salary": 6500, "growth": 25, "openings": 2900 },
+    { "id": 4, "title": "Data Scientist", "salary": 6800, "growth": 20, "openings": 2100 },
+    { "id": 5, "title": "Cloud Architect", "salary": 7000, "growth": 18, "openings": 1500 }
+  ],
+  "stats": {
+    "openingPositions": "10k+",
+    "averageSalary": "8,250K EGP",
+    "growthRate": "+23%"
+  }
+}
