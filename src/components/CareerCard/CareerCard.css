@@ -1,0 +1,11 @@
+.career-card__rank--gold {
+  color: #eab308;
+}
+
+.career-card__rank--silver {
+  color: #9ca3af;
+}
+
+.career-card__rank--bronze {
+  color: #ef4444;
+}

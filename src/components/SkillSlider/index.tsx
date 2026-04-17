@@ -1,4 +1,4 @@
-import type { SkillLevel } from "../types";
+import type { SkillLevel } from "../../types";
 
 interface SkillSliderProps {
   name: string;
@@ -22,11 +22,22 @@ export default function SkillSlider({ name, level, onChange }: SkillSliderProps)
         <span className="text-sm font-medium text-gray-900 dark:text-white">{level}</span>
       </div>
 
-      <input type="range" min={0} max={2} step={1} value={index} onChange={handleChange} className="w-full h-2 rounded-full appearance-none cursor-pointer bg-gray-300 dark:bg-gray-600 accent-gray-900 dark:accent-white"/>
+      <input
+        type="range"
+        min={0}
+        max={2}
+        step={1}
+        value={index}
+        onChange={handleChange}
+        className="w-full h-2 rounded-full appearance-none cursor-pointer bg-gray-300 dark:bg-gray-600 accent-gray-900 dark:accent-white"
+      />
 
       <div className="flex justify-between mt-1.5">
         {LEVELS.map((l) => (
-          <span key={l} className={`text-xs ${ l === level ? "text-gray-700 dark:text-gray-200" : "text-gray-400 dark:text-gray-500" }`}>
+          <span
+            key={l}
+            className={`text-xs ${l === level ? "text-gray-700 dark:text-gray-200" : "text-gray-400 dark:text-gray-500"}`}
+          >
             {l}
           </span>
         ))}

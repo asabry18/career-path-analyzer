@@ -1,5 +1,5 @@
 import { Building2, DollarSign, TrendingUp } from "lucide-react";
-import type { Stats } from "../types";
+import type { Stats } from "../../types";
 
 interface StatsCardsProps {
   stats: Stats;
@@ -25,7 +25,7 @@ export default function StatsCards({ stats }: StatsCardsProps) {
               {stats[key]}
             </p>
           </div>
-        </div>
+        </div> 
       ))}
     </div>
   );

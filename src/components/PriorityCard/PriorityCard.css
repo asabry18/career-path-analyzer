@@ -1,0 +1,14 @@
+.priority-card__weight {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 600;
+  color: #111827;
+  background-color: #f3f4f6;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+}
+
+.dark .priority-card__weight {
+  color: #fff;
+  background-color: #1f2937;
+}
