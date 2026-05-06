@@ -1,0 +1,42 @@
+﻿cleaned_title;demand;salary_month;avg_salary;skills;frameworks
+backend developer;90;EGP 8K - EGP 21K;14.5;['python', 'java', 'c#', 'rest apis', 'database', 'sql',  'docker', 'git', 'aws', 'microservices' , 'security'];Node.js, Django, Laravel, Spring Boot
+full stack developer;68;EGP 9K - EGP 24K;16.5;['html', 'css', 'javascript', 'database', 'sql', 'nosql', 'git', 'docker', 'aws', 'restful apis', 'unit testing'];
+it support specialist;45;EGP 5K - EGP 21K;13;['troubleshooting', 'windows', 'linux', 'networking', 'active directory', 'ticketing systems', 'customer support', 'customer service', 'hardware troubleshooting'];
+frontend developer;47;EGP 8K - EGP 19K;13.5;['html', 'css', 'javascript', 'responsive design', 'git', 'api integration', 'ui/ux basics', 'bootstrap',];React, Angular, Vue
+software engineer;39;EGP 6K - EGP 15K;10.5;['python', 'java', 'c++', 'c#', 'data structures', 'algorithms', 'sql', 'api development', 'unit testing', 'git', 'cloud', 'sdlc', 'design patterns'];
+it help desk ;30;EGP 4K - EGP 10K;7;['ticketing systems', 'customer support', 'remote troubleshooting'];
+security engineer;29;EGP 8K - EGP 34K;21;['network security', 'firewalls', 'siem tools', 'pen testing', 'vulnerability scanning', 'python', 'bash', 'cloud security'];
+business developer;25;EGP 7K - EGP 25K;16;['sales', 'crm', 'market research', 'lead generation', 'negotiation', 'communication', 'business analysis'];
+it manager;22;EGP 16K - EGP 42K;29;['it strategy', 'project management', 'networking', 'cloud', 'security', 'team leadership', 'budgeting'];
+mobile developer;19;EGP 6K - EGP 20K;13;['rest apis', 'git', 'firebase', 'ui/ux basics'];Flutter, React Native, Swift, Kotlin
+data analyst;17;EGP 9K - EGP 21K;15;['sql', 'excel', 'power bi', 'tableau', 'python', 'statistics', 'data cleaning', 'visualization'];TensorFlow, PyTorch, Scikit-Learn
+oracle developer;16;EGP 11K - EGP 22K;16.5;['oracle database', 'pl/sql', 'sql', 'forms and reports', 'performance tuning', 'backup and recovery'];
+odoo developer;16;EGP 8K - EGP 19K;13.5;['python', 'odoo framework', 'xml', 'qweb', 'postgresql', 'api integration'];
+software tester;16;EGP 7K - EGP 19K;13;['manual testing', 'selenium', 'cypress', 'test cases', 'jira', 'api testing', 'postman'];
+data engineer;14;EGP 13K - EGP 33K;23;['python', 'sql', 'etl', 'airflow', 'spark', 'aws', 'big data'];TensorFlow, PyTorch, Scikit-Learn
+devops engineer;11;EGP 13K - EGP 25K;19;['docker', 'kubernetes', 'jenkins', 'github actions', 'terraform', 'linux', 'aws', 'bash', 'python'];
+android developer;10;EGP 11K - EGP 24K;17.5;['java', 'android sdk', 'jetpack', 'rest apis', 'firebase', 'git', 'kotlin'];
+data scientist;9;EGP 11K - EGP 31K;21;['python', 'machine learning', 'deep learning', 'sql', 'statistics', 'pandas', 'numpy'];TensorFlow, PyTorch, Scikit-Learn
+application support;9;EGP 11K - EGP 25K;18;['troubleshooting', 'sql', 'linux', 'monitoring tools', 'api debugging', 'ticketing'];
+cloud engineer;8;EGP 12K - EGP 30K;21;['aws', 'azure', 'gcp', 'terraform', 'kubernetes', 'linux', 'cloud networking'];
+network engineer;8;EGP 7K - EGP 15K;11;['ccna', 'routing', 'switching', 'firewalls', 'vpn', 'tcp/ip', 'network monitoring'];
+project manager;6;EGP 5K - EGP 26K;15.5;['project planning', 'agile', 'scrum', 'risk management', 'jira', 'documentation', 'leadership'];
+ios developer;6;EGP 8K - EGP 30k;19;['xcode', 'swiftui', 'uikit', 'rest apis', 'firebase', 'git', 'swift'];
+wordpress developer;6;EGP 5K - EGP 28K;16.5;['wordpress', 'php', 'html', 'css', 'javascript', 'plugins', 'themes', 'mysql'];
+python developer;6;EGP 6K - EGP 30K;18;['python', 'django', 'flask', 'fastapi', 'sql', 'git', 'docker'];
+ai automation specialist;5;EGP 16K - EGP 25K;20.5;['python', 'machine learning', 'nlp', 'rpa', 'uipath', 'automation anywhere', 'api integration', 'cloud ai tools'];TensorFlow, PyTorch
+erp developer;5;EGP 7K - EGP 10K;8.5;['erp systems', 'sql', 'python', 'java', 'api integration', 'business processes'];
+java developer;4;EGP 4K - EGP 8K;6;['java', 'spring boot', 'rest apis', 'sql', 'git', 'maven', 'gradle'];
+ui ux designer;4;EGP 6K - EGP 13K;9.5;['figma', 'adobe xd', 'wireframing', 'prototyping', 'user research', 'design systems'];
+zoho developer;3;EGP 6K - EGP 12K;9;['zoho crm', 'deluge scripting', 'api integration', 'workflow automation'];
+desktop developer;3;EGP 5K - EGP 10K;7.5;['c#', '.net', 'wpf', 'winforms', 'sql', 'git'];
+sharepoint developer;2;EGP 15K - EGP 20K;17.5;['sharepoint', 'power automate', 'power apps', 'c#', 'javascript', 'workflows'];
+sap developer;2;EGP 9K - EGP 18K;13.5;['abap', 'sap modules', 'sql', 'fiori', 'ui5'];
+game developer;2;EGP 5K - EGP 16K;10.5;['unity', 'unreal engine', 'c#', 'c++', 'animation', 'game physics'];
+scrum master;2;EGP 22K - EGP 43K;32.5;['agile', 'scrum', 'sprint planning', 'jira', 'facilitation', 'communication'];
+plm developer;1;EGP 19K - EGP 21K;20;['teamcenter', 'aras plm', 'sql', 'java', 'c#', 'api integration'];
+sql developer;1;EGP 8K - EGP 21K;14.5;['sql', 'stored procedures', 'performance tuning', 'etl', 'data modeling'];
+drupal developer;1;EGP 7K - EGP 11K;9;['drupal', 'php', 'html', 'css', 'javascript', 'mysql'];
+audit executive;1;EGP 5K - EGP 11K;8;['internal control', 'risk assessment', 'excel', 'reporting', 'compliance'];
+computer vision;1;EGP 9K - EGP 45K;27;['python', 'opencv', 'deep learning', 'tensorflow', 'pytorch', 'image processing'];
+javascript developer;1;EGP 6K - EGP 30K;18;['javascript', 'node.js', 'react', 'vue', 'angular', 'git', 'html', 'css'];
