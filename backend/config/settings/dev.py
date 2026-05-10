@@ -7,7 +7,7 @@ from .base import *  # noqa: F403
 
 DEBUG = os.environ.get("DEBUG", "True").lower() in ("1", "true", "yes")
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "[::1]"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "[::1]", "testserver"]
 
 
 def _postgres_from_url(url: str) -> dict:

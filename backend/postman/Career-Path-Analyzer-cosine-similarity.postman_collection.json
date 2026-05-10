@@ -1,0 +1,479 @@
+{
+  "info": {
+    "name": "Career Path Analyzer — local DSS (catalog + pipeline)",
+    "_postman_id": "c7a9e2b1-career-local",
+    "description": "Import once; adjust **Collection variable** `base_url` if your server differs.\n\n**Requirements**\n- Django **`DEBUG=True`** (otherwise **`/api/test/*`** returns **404**).\n- Catalog seeded (`python manage.py seed_catalog`).\n- Server: `python manage.py runserver` from `backend/`.\n\n**Suggested order**\n1. **Catalog → skills list** — sets `skill_id_1` … `skill_id_4` from the DB.\n2. **Catalog → jobs list** — sanity-check titles/salary.\n3. **Debug → similarity preview** — dense cosine skill match only.\n4. **Debug → pipeline preview** — similarity → **`threshold`** → decision matrix (skill match, salary, demand, learning effort) → **AHP** (`pairwise`, 6 rows) → **TOPSIS** → `ranked_jobs` (+ gaps).\n\n**Pipeline body notes**\n- `pairwise` must list **exactly six** unordered criterion pairs (`skill_match`, `salary`, `demand`, `learning_effort`). Same shape as **`POST /api/analyze`** in the spec.\n- `threshold`: default in code is **0.4**; use **`0.0`** in the \"full rank\" request so all fetched jobs survive filtering while you experiment.\n- `learning_effort` = mandatory skills still at weight 0 + framework OR slots where the user has **no** skill in that slot.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "base_url", "value": "http://127.0.0.1:8000"},
+    {"key": "skill_id_1", "value": "1", "description": "Auto-set from GET /api/skills/"},
+    {"key": "skill_id_2", "value": "2"},
+    {"key": "skill_id_3", "value": "3"},
+    {"key": "skill_id_4", "value": "4"}
+  ],
+  "item": [
+    {
+      "name": "Catalog",
+      "item": [
+        {
+          "name": "skills list (auto-fills skill_id_1..4)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "try {",
+                  "  var j = pm.response.json();",
+                  "  pm.test('Is array', function () { pm.expect(Array.isArray(j)).to.be.true; });",
+                  "  for (var i = 0; i < Math.min(4, j.length); i++) {",
+                  "    pm.collectionVariables.set('skill_id_' + (i + 1), String(j[i].id));",
+                  "  }",
+                  "} catch (e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": "{{base_url}}/api/skills/"
+          }
+        },
+        {
+          "name": "jobs list",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["pm.test('Status 200', function () { pm.response.to.have.status(200); });"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": "{{base_url}}/api/jobs/"
+          }
+        },
+        {
+          "name": "courses list",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": "{{base_url}}/api/courses/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Debug (requires DEBUG=True)",
+      "item": [
+        {
+          "name": "catalog-stats",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": "{{base_url}}/api/test/catalog-stats/"
+          }
+        },
+        {
+          "name": "dense cosine — worked numeric example (static)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Accept", "value": "application/json"}],
+            "url": "{{base_url}}/api/test/cosine-example/"
+          }
+        },
+        {
+          "name": "similarity preview — numeric weights",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200', function () { pm.response.to.have.status(200); });",
+                  "var b = pm.response.json();",
+                  "pm.test('has jobs_preview', function () { pm.expect(b.jobs_preview).to.be.an('array'); });",
+                  "pm.test('scenario_vocab_size', function () { pm.expect(b.scenario_vocab_size).to.be.above(0); });",
+                  "if (b.jobs_preview && b.jobs_preview.length >= 2) {",
+                  "  var n0 = b.jobs_preview[0].norm_user_vector;",
+                  "  pm.test('shared user norm across jobs', function () { pm.expect(b.jobs_preview[1].norm_user_vector).to.eql(n0); });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Accept", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"weights\": {\n    \"{{skill_id_1}}\": 0.6,\n    \"{{skill_id_2}}\": 0.9\n  },\n  \"limit_jobs\": 15\n}"
+            },
+            "url": "{{base_url}}/api/test/similarity-preview/"
+          }
+        },
+        {
+          "name": "similarity preview — 2 skill levels",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Accept", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"skills\": [\n    { \"skill_id\": {{skill_id_1}}, \"level\": \"intermediate\" },\n    { \"skill_id\": {{skill_id_2}}, \"level\": \"advanced\" }\n  ],\n  \"limit_jobs\": 15\n}"
+            },
+            "url": "{{base_url}}/api/test/similarity-preview/"
+          }
+        },
+        {
+          "name": "similarity preview — mixed levels",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "var b = pm.response.json();",
+                  "pm.test('user_skills_resolved', function () { pm.expect(b.user_skills_resolved).to.be.an('array'); });",
+                  "pm.test('scenario_vocab_size', function () { pm.expect(b.scenario_vocab_size).to.be.above(0); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Accept", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"skills\": [\n    { \"skill_id\": {{skill_id_1}}, \"level\": \"beginner\" },\n    { \"skill_id\": {{skill_id_2}}, \"level\": \"intermediate\" },\n    { \"skill_id\": {{skill_id_3}}, \"level\": \"advanced\" }\n  ],\n  \"limit_jobs\": 40\n}"
+            },
+            "url": "{{base_url}}/api/test/similarity-preview/"
+          }
+        },
+        {
+          "name": "pipeline preview — similarity + AHP + TOPSIS (threshold 0)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "var b = pm.response.json();",
+                  "pm.test('has ahp.weights', function () { pm.expect(b.ahp && b.ahp.weights).to.be.ok; });",
+                  "if (b.ahp && b.ahp.weights) {",
+                  "  var sum = 0;",
+                  "  for (var k in b.ahp.weights) { sum += b.ahp.weights[k]; }",
+                  "  pm.test('AHP weights sum to 1', function () { pm.expect(sum).to.be.within(0.999, 1.001); });",
+                  "}",
+                  "pm.test('has ranked_jobs array', function () { pm.expect(b.ranked_jobs).to.be.an('array'); });",
+                  "if (b.ranked_jobs && b.ranked_jobs.length > 1) {",
+                  "  pm.test('TOPSIS: rank 1 closeness ≥ last', function () {",
+                  "    pm.expect(b.ranked_jobs[0].topsis_score).to.be.at.least(b.ranked_jobs[b.ranked_jobs.length - 1].topsis_score);",
+                  "  });",
+                  "}",
+                  "if (b.ranked_jobs && b.ranked_jobs.length > 0) {",
+                  "  pm.collectionVariables.set('pipeline_top_job_id', String(b.ranked_jobs[0].job_id));",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Accept", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"weights\": {\n    \"{{skill_id_1}}\": 0.6,\n    \"{{skill_id_2}}\": 0.9\n  },\n  \"pairwise\": [\n    { \"a\": \"skill_match\", \"b\": \"salary\", \"value\": 3 },\n    { \"a\": \"skill_match\", \"b\": \"demand\", \"value\": 5 },\n    { \"a\": \"skill_match\", \"b\": \"learning_effort\", \"value\": 7 },\n    { \"a\": \"salary\", \"b\": \"demand\", \"value\": 3 },\n    { \"a\": \"salary\", \"b\": \"learning_effort\", \"value\": 5 },\n    { \"a\": \"demand\", \"b\": \"learning_effort\", \"value\": 3 }\n  ],\n  \"threshold\": 0.0,\n  \"limit_jobs\": 35\n}"
+            },
+            "url": "{{base_url}}/api/test/pipeline-preview/"
+          }
+        },
+        {
+          "name": "pipeline preview — skills payload + threshold 0.4 (prod-like)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "var b = pm.response.json();",
+                  "pm.test('reports jobs_after_threshold', function () { pm.expect(typeof b.jobs_after_threshold).to.eql('number'); });",
+                  "if (b.ranked_jobs && b.ranked_jobs.length === 0) {",
+                  "  pm.test('empty ranks explained', function () { pm.expect(b.detail).to.be.a('string'); });",
+                  "}",
+                  "if (b.ranked_jobs && b.ranked_jobs.length > 0) {",
+                  "  pm.test('each row has TOPSIS score', function () {",
+                  "    pm.expect(b.ranked_jobs[0].topsis_score).to.be.a('number');",
+                  "  });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Accept", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"skills\": [\n    { \"skill_id\": {{skill_id_1}}, \"level\": \"intermediate\" },\n    { \"skill_id\": {{skill_id_2}}, \"level\": \"advanced\" }\n  ],\n  \"pairwise\": [\n    { \"a\": \"skill_match\", \"b\": \"salary\", \"value\": 3 },\n    { \"a\": \"skill_match\", \"b\": \"demand\", \"value\": 5 },\n    { \"a\": \"skill_match\", \"b\": \"learning_effort\", \"value\": 7 },\n    { \"a\": \"salary\", \"b\": \"demand\", \"value\": 3 },\n    { \"a\": \"salary\", \"b\": \"learning_effort\", \"value\": 5 },\n    { \"a\": \"demand\", \"b\": \"learning_effort\", \"value\": 3 }\n  ],\n  \"threshold\": 0.4,\n  \"limit_jobs\": 40\n}"
+            },
+            "url": "{{base_url}}/api/test/pipeline-preview/"
+          }
+        },
+        {
+          "name": "pipeline preview — bad pairwise (expects 400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', function () { pm.response.to.have.status(400); });",
+                  "var b = pm.response.json();",
+                  "pm.test('detail present', function () { pm.expect(b.detail).to.be.a('string'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Accept", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"weights\": { \"{{skill_id_1}}\": 0.6 },\n  \"pairwise\": [\n    { \"a\": \"skill_match\", \"b\": \"salary\", \"value\": 3 }\n  ],\n  \"threshold\": 0,\n  \"limit_jobs\": 5\n}"
+            },
+            "url": "{{base_url}}/api/test/pipeline-preview/"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Analyze API (POST /api/analyze/)",
+      "item": [
+        {
+          "name": "Test 1 — PDF scenario: demand-priority frontend user",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "",
+                  "var b = pm.response.json();",
+                  "",
+                  "// ── AHP weights ──",
+                  "pm.test('has ahp object', function () { pm.expect(b.ahp).to.be.an('object'); });",
+                  "pm.test('AHP consistency_ok is true', function () { pm.expect(b.ahp.consistency_ok).to.be.true; });",
+                  "pm.test('AHP CR < 0.1', function () { pm.expect(b.ahp.consistency_ratio).to.be.below(0.1); });",
+                  "",
+                  "if (b.ahp && b.ahp.weights) {",
+                  "  var w = b.ahp.weights;",
+                  "  var sum = 0; for (var k in w) { sum += w[k]; }",
+                  "  pm.test('AHP weights sum ≈ 1', function () { pm.expect(sum).to.be.within(0.999, 1.001); });",
+                  "  pm.test('demand has highest weight (~0.577)', function () { pm.expect(w.demand).to.be.above(0.50); });",
+                  "  pm.test('learning_effort > skill_match', function () { pm.expect(w.learning_effort).to.be.above(w.skill_match); });",
+                  "  pm.test('skill_match > salary', function () { pm.expect(w.skill_match).to.be.above(w.salary); });",
+                  "  pm.test('salary is smallest weight', function () { pm.expect(w.salary).to.be.below(0.10); });",
+                  "}",
+                  "",
+                  "// ── Ranked jobs ──",
+                  "pm.test('has ranked_jobs array', function () { pm.expect(b.ranked_jobs).to.be.an('array'); });",
+                  "pm.test('at least 1 ranked job', function () { pm.expect(b.ranked_jobs.length).to.be.above(0); });",
+                  "",
+                  "if (b.ranked_jobs && b.ranked_jobs.length > 1) {",
+                  "  pm.test('TOPSIS scores descending', function () {",
+                  "    for (var i = 1; i < b.ranked_jobs.length; i++) {",
+                  "      pm.expect(b.ranked_jobs[i-1].topsis_score).to.be.at.least(b.ranked_jobs[i].topsis_score);",
+                  "    }",
+                  "  });",
+                  "}",
+                  "",
+                  "if (b.ranked_jobs && b.ranked_jobs.length > 0) {",
+                  "  var top = b.ranked_jobs[0];",
+                  "  pm.test('top job has required fields', function () {",
+                  "    pm.expect(top.rank).to.eql(1);",
+                  "    pm.expect(top.title).to.be.a('string');",
+                  "    pm.expect(top.topsis_score).to.be.a('number');",
+                  "    pm.expect(top.skill_match_score).to.be.a('number');",
+                  "    pm.expect(top.avg_salary).to.be.a('number');",
+                  "    pm.expect(top.demand_score).to.be.a('number');",
+                  "    pm.expect(top.learning_effort).to.be.a('number');",
+                  "    pm.expect(top.missing_skills).to.be.an('array');",
+                  "    pm.expect(top.optional_frameworks).to.be.an('array');",
+                  "    pm.expect(top.description).to.be.a('string');",
+                  "  });",
+                  "}",
+                  "",
+                  "// ── Learning plan ──",
+                  "pm.test('has learning_plan', function () { pm.expect(b.learning_plan).to.be.an('object'); });",
+                  "pm.test('learning_plan has selected_courses', function () { pm.expect(b.learning_plan.selected_courses).to.be.an('array'); });",
+                  "pm.test('learning_plan solver_status', function () { pm.expect(b.learning_plan.solver_status).to.be.a('string'); });",
+                  "",
+                  "// ── Meta ──",
+                  "pm.test('has meta object', function () { pm.expect(b.meta).to.be.an('object'); });",
+                  "pm.test('meta.jobs_evaluated > 0', function () { pm.expect(b.meta.jobs_evaluated).to.be.above(0); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Accept", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"skills\": [\n    { \"name\": \"HTML\", \"level\": \"Intermediate\" },\n    { \"name\": \"CSS\", \"level\": \"Intermediate\" },\n    { \"name\": \"JavaScript\", \"level\": \"Advanced\" },\n    { \"name\": \"React\", \"level\": \"Advanced\" }\n  ],\n  \"priorities\": [\"demand\", \"learn\", \"match\", \"salary\"],\n  \"threshold\": 0.1\n}"
+            },
+            "url": "{{base_url}}/api/analyze/"
+          }
+        },
+        {
+          "name": "Test 1b — same user, threshold=0 (see all jobs)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "var b = pm.response.json();",
+                  "pm.test('more jobs with threshold=0', function () {",
+                  "  pm.expect(b.meta.jobs_after_threshold).to.eql(b.meta.jobs_evaluated);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Accept", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"skills\": [\n    { \"name\": \"HTML\", \"level\": \"Intermediate\" },\n    { \"name\": \"CSS\", \"level\": \"Intermediate\" },\n    { \"name\": \"JavaScript\", \"level\": \"Advanced\" },\n    { \"name\": \"React\", \"level\": \"Advanced\" }\n  ],\n  \"priorities\": [\"demand\", \"learn\", \"match\", \"salary\"],\n  \"threshold\": 0.0\n}"
+            },
+            "url": "{{base_url}}/api/analyze/"
+          }
+        },
+        {
+          "name": "Test 1c — same user, skill_match priority (expect JS Dev rank 1)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "var b = pm.response.json();",
+                  "pm.test('skill_match has highest weight', function () {",
+                  "  var w = b.ahp.weights;",
+                  "  pm.expect(w.skill_match).to.be.above(w.demand);",
+                  "  pm.expect(w.skill_match).to.be.above(w.learning_effort);",
+                  "  pm.expect(w.skill_match).to.be.above(w.salary);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Accept", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"skills\": [\n    { \"name\": \"HTML\", \"level\": \"Intermediate\" },\n    { \"name\": \"CSS\", \"level\": \"Intermediate\" },\n    { \"name\": \"JavaScript\", \"level\": \"Advanced\" },\n    { \"name\": \"React\", \"level\": \"Advanced\" }\n  ],\n  \"priorities\": [\"match\", \"learn\", \"demand\", \"salary\"],\n  \"threshold\": 0.1\n}"
+            },
+            "url": "{{base_url}}/api/analyze/"
+          }
+        },
+        {
+          "name": "Validation — unknown skill (expects 400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', function () { pm.response.to.have.status(400); });",
+                  "var b = pm.response.json();",
+                  "pm.test('detail mentions unknown', function () { pm.expect(b.detail).to.include('Unknown'); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Accept", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"skills\": [\n    { \"name\": \"FakeSkill123\", \"level\": \"Beginner\" }\n  ],\n  \"priorities\": [\"match\", \"salary\", \"demand\", \"learn\"],\n  \"threshold\": 0.4\n}"
+            },
+            "url": "{{base_url}}/api/analyze/"
+          }
+        },
+        {
+          "name": "Validation — missing priorities (expects 400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Accept", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"skills\": [\n    { \"name\": \"HTML\", \"level\": \"Beginner\" }\n  ],\n  \"priorities\": [\"match\", \"salary\"]\n}"
+            },
+            "url": "{{base_url}}/api/analyze/"
+          }
+        }
+      ]
+    }
+  ]
+}

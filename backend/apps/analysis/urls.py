@@ -4,6 +4,7 @@ from . import debug_views, views
 
 urlpatterns = [
     path("_ping/analysis/", views.placeholder, name="analysis-ping"),
+    path("analyze/", views.analyze, name="analyze"),
     path(
         "test/catalog-stats/",
         debug_views.test_catalog_stats,
@@ -18,5 +19,10 @@ urlpatterns = [
         "test/similarity-preview/",
         debug_views.test_similarity_preview,
         name="analysis-test-similarity-preview",
+    ),
+    path(
+        "test/pipeline-preview/",
+        debug_views.test_pipeline_preview,
+        name="analysis-test-pipeline-preview",
     ),
 ]

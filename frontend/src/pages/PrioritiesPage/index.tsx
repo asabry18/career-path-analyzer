@@ -1,27 +1,28 @@
-import { useState, useRef } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PageLayout from "../../components/PageLayout";
 import BackButton from "../../components/BackButton";
 import PageHeader from "../../components/PageHeader";
 import PrimaryButton from "../../components/PrimaryButton";
 import PriorityCard from "../../components/PriorityCard";
-import { DEFAULT_PRIORITIES } from "../../data/priorities";
-import type { Priority } from "../../types";
+import { useAnalysis } from "../../context/AnalysisContext";
 import "./PrioritiesPage.css";
 
 export default function PrioritiesPage() {
   const navigate = useNavigate();
-  const [priorities, setPriorities] = useState<Priority[]>(DEFAULT_PRIORITIES);
+  const { priorities, setPriorities, skills, runAnalysis, loading, error } =
+    useAnalysis();
+
   const dragItem = useRef<number | null>(null);
   const dragOverItem = useRef<number | null>(null);
   const [draggingIdx, setDraggingIdx] = useState<number | null>(null);
 
   function swap(a: number, b: number) {
-    setPriorities((prev) => {
-      const next = [...prev];
-      [next[a], next[b]] = [next[b], next[a]];
-      return next;
-    });
+    setPriorities(
+      priorities.map((p, i) =>
+        i === a ? priorities[b] : i === b ? priorities[a] : p
+      )
+    );
   }
 
   function handleDragStart(index: number) {
@@ -37,16 +38,19 @@ export default function PrioritiesPage() {
     const from = dragItem.current;
     const to = dragOverItem.current;
     if (from !== null && to !== null && from !== to) {
-      setPriorities((prev) => {
-        const next = [...prev];
-        const [removed] = next.splice(from, 1);
-        next.splice(to, 0, removed);
-        return next;
-      });
+      const next = [...priorities];
+      const [removed] = next.splice(from, 1);
+      next.splice(to, 0, removed);
+      setPriorities(next);
     }
     dragItem.current = null;
     dragOverItem.current = null;
     setDraggingIdx(null);
+  }
+
+  async function handleAnalyze() {
+    await runAnalysis();
+    navigate("/recommendations");
   }
 
   return (
@@ -88,7 +92,24 @@ export default function PrioritiesPage() {
         ))}
       </div>
 
-      <PrimaryButton label="View Recommendations" onClick={() => navigate("/recommendations")} />
+      {error && (
+        <div className="mt-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-5 py-3">
+          <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
+        </div>
+      )}
+
+      <PrimaryButton
+        label="View Recommendations"
+        onClick={handleAnalyze}
+        disabled={skills.length === 0}
+        loading={loading}
+      />
+
+      {skills.length === 0 && (
+        <p className="text-center text-sm text-gray-400 dark:text-gray-500 mt-2">
+          Go back and add at least one skill first.
+        </p>
+      )}
     </PageLayout>
   );
 }

@@ -1,13 +1,18 @@
 """
-Skill match combining mandatory cosine alignment with per-slot max for frameworks.
+Skill match score = cosine similarity on a unified global skill vocabulary.
 
-Mandatory requirement vector is binary ones on mandatory skill dimensions; user
-contributions follow the weighted ``u`` vector. Each framework slot counts as one
-logical demand unit: its fulfillment is ``max_{t in slot} u_t`` in [0, 1].
+**Scenario (dense cosine)**
 
-The final ``skill_match_score`` blends mandatory cosine (weighted by mandatory
-skill count) and slot maxima (summed across slots), divided by (#mandatory skills
-+ #slots). Pure NumPy linear algebra aside from orchestration guards.
+- Fixed ordered vocabulary IDs (typically ``sorted(...)`` union of skills from jobs and the user).
+- **Job binary vector** ``j``: ``j[k] = 1`` where the skill is required—mandatory rows **or**
+  **any framework alternative** (relaxed OR-bag encoding; each referenced skill contributes a dimension).
+  Zeros elsewhere.
+- **User vector** ``u``: declared weights ``[0,1]`` on chosen skills, zeros elsewhere.
+- **Cosine**:
+  ``similarity = (u · j) / (||u|| × ||j||)``.
+
+Dots count only overlaps: extra unrelated user skills enlarge ``||u||`` but contribute **0**
+to ``u · j``. Skills the job marks with ``0`` do not enlarge ``||u||``.
 """
 
 from __future__ import annotations
@@ -28,9 +33,21 @@ def collect_skill_ids(jobs: Iterable[JobRequirements]) -> frozenset[int]:
     return frozenset(ids)
 
 
+def build_vocab_skill_ids_ordered(
+    jobs: Iterable[JobRequirements],
+    user_skill_weights: Mapping[int, float],
+) -> tuple[int, ...]:
+    """
+    Scenario “master skill list”: all skills appearing in evaluated jobs plus any the user declares.
+    Stable order ``sorted(skill_id)``.
+    """
+    ids = set(collect_skill_ids(jobs))
+    ids.update(int(k) for k in user_skill_weights.keys())
+    return tuple(sorted(ids))
+
+
 def build_vocab_index(skill_ids: Sequence[int]) -> dict[int, int]:
-    """Stable index 0 .. n-1 for every skill ID in the union vocabulary."""
-    return {sid: i for i, sid in enumerate(sorted(skill_ids))}
+    return {sid: i for i, sid in enumerate(skill_ids)}
 
 
 def user_dense_vector(
@@ -48,104 +65,121 @@ def user_dense_vector(
     return vec
 
 
-def _mandatory_cosine(
-    user_weights_by_id: Mapping[int, float],
-    mandatory_ids: Iterable[int],
-) -> float:
-    """
-    Cosine similarity between the user's mandatory sub-vector and an all-ones target.
-
-    Guards: empty mandatory ⇒ 1.0 (vacuous match); zero user norm ⇒ 0.0.
-    """
-    mids = sorted(set(mandatory_ids))
-    if not mids:
-        return 1.0
-    u = np.array([float(user_weights_by_id.get(s, 0.0)) for s in mids], dtype=np.float64)
-    ones = np.ones_like(u)
-    nu = np.linalg.norm(u)
-    nj = np.linalg.norm(ones)
-    if nu <= 0.0 or nj <= 0.0:
-        return 0.0
-    cos = float(np.dot(u, ones) / (nu * nj))
-    return float(np.clip(cos, 0.0, 1.0))
-
-
-def _framework_slot_aggregate(
-    user_weights_by_id: Mapping[int, float],
-    framework_slots: tuple[frozenset[int], ...],
-) -> tuple[float, int]:
-    """
-    Sum of ``max(users in slot)`` per slot — each slot is one unit capped at [0,1].
-    Also returns slot count K (for denominators).
-    """
-    slot_max_sum = 0.0
-    for slot in framework_slots:
-        if not slot:
-            continue
-        vmax = max(float(user_weights_by_id.get(sid, 0.0)) for sid in slot)
-        slot_max_sum += float(np.clip(vmax, 0.0, 1.0))
-    return slot_max_sum, len(framework_slots)
-
-
-def skill_match_score(
+def job_relaxed_binary_vector(
     job: JobRequirements,
-    user_skill_weights: Mapping[int, float],
-) -> float:
+    skill_index: Mapping[int, int],
+    dim: int,
+) -> np.ndarray:
     """
-    Single score in ``[0, 1]`` per plan Step 5.
+    Binary job profile: mandatory AND every framework alternative carries weight 1
+    over the shared vocab (relax-bag embedding for similarity).
+    """
+    vec = np.zeros(dim, dtype=np.float64)
+    for sid in job.mandatory_skill_ids:
+        hi = skill_index.get(sid)
+        if hi is not None:
+            vec[hi] = 1.0
+    for slot in job.framework_slots:
+        for sid in slot:
+            hi = skill_index.get(sid)
+            if hi is not None:
+                vec[hi] = 1.0
+    return vec
 
-    When there are neither mandatory skills nor slots, score is ``1.0``.
-    """
-    return float(skill_match_breakdown(job, user_skill_weights)["score"])
+
+def dense_cosine_from_vectors(user_vec: np.ndarray, job_vec: np.ndarray) -> float:
+    """``(u·j)/(||u||·||j||)`` clipped to ``[0,1]``. Handles zero-job / zero-user norms."""
+    dot_val = float(np.dot(user_vec, job_vec))
+    nu = float(np.linalg.norm(user_vec))
+    nj = float(np.linalg.norm(job_vec))
+
+    tol = 1e-18
+    if nj <= tol:
+        return 1.0
+    if nu <= tol:
+        return 0.0
+
+    cos = dot_val / (nu * nj)
+    return float(np.clip(cos, 0.0, 1.0))
 
 
 def skill_match_breakdown(
     job: JobRequirements,
     user_skill_weights: Mapping[int, float],
-) -> dict[str, float | int]:
+    *,
+    vocab_skill_ids_ordered: Sequence[int],
+) -> dict[str, float | int | bool]:
     """
-    Numeric parts of :func:`skill_match_score` for debugging / API transparency.
-
-    Keys are stable for JSON responses. ``score`` matches :func:`skill_match_score`.
+    ``score`` = dense cosine similarity (scenario Steps 6–7) on ``vocab_skill_ids_ordered``.
     """
-    n_m = len(job.mandatory_skill_ids)
-    usable_slots = tuple(s for s in job.framework_slots if s)
-    n_f = len(usable_slots)
-    denom_f = float(n_m + n_f)
-    if denom_f <= 0.0:
+    vocab = tuple(vocab_skill_ids_ordered)
+    index = build_vocab_index(vocab)
+    dim = len(vocab)
+    if dim == 0:
         return {
             "score": 1.0,
             "no_requirements": True,
-            "mandatory_cosine": 1.0,
-            "mandatory_skill_count": 0,
-            "framework_slot_count": 0,
-            "slot_max_sum": 0.0,
-            "numerator": 0.0,
-            "denominator": 0,
+            "vocab_dimension": 0,
+            "dot_product_u_dot_j": 0.0,
+            "norm_user_vector": 0.0,
+            "norm_job_binary_vector": 0.0,
+            "job_binary_skill_count": 0,
         }
-    mand = _mandatory_cosine(user_skill_weights, job.mandatory_skill_ids)
-    slot_sum, _ = _framework_slot_aggregate(user_skill_weights, usable_slots)
-    numerator = float(n_m) * mand + slot_sum
-    score = float(np.clip(numerator / denom_f, 0.0, 1.0))
+
+    weights = {int(k): float(v) for k, v in user_skill_weights.items()}
+    user_vec = user_dense_vector(index, dim, weights)
+    job_vec = job_relaxed_binary_vector(job, index, dim)
+
+    dot_val = float(np.dot(user_vec, job_vec))
+    nu = float(np.linalg.norm(user_vec))
+    nj = float(np.linalg.norm(job_vec))
+
+    score = dense_cosine_from_vectors(user_vec, job_vec)
+
+    job_support = int(round(np.sum(job_vec)))
     return {
         "score": score,
-        "no_requirements": False,
-        "mandatory_cosine": mand,
-        "mandatory_skill_count": n_m,
-        "framework_slot_count": n_f,
-        "slot_max_sum": float(slot_sum),
-        "numerator": float(numerator),
-        "denominator": int(round(denom_f)),
+        "no_requirements": job_support <= 0,
+        "vocab_dimension": dim,
+        "dot_product_u_dot_j": dot_val,
+        "norm_user_vector": nu,
+        "norm_job_binary_vector": nj,
+        "job_binary_skill_count": job_support,
     }
+
+
+def skill_match_score(
+    job: JobRequirements,
+    user_skill_weights: Mapping[int, float],
+    *,
+    vocab_skill_ids_ordered: Sequence[int],
+) -> float:
+    """Public score in ``[0,1]`` over the given vocabulary."""
+    return float(
+        skill_match_breakdown(
+            job, user_skill_weights, vocab_skill_ids_ordered=vocab_skill_ids_ordered
+        )["score"]
+    )
 
 
 def skill_match_scores_for_jobs(
     jobs: Iterable[JobRequirements],
     user_skill_weights: Mapping[int, float],
+    *,
+    vocab_skill_ids_ordered: Sequence[int] | None = None,
 ) -> dict[int, float]:
-    """Compute ``skill_match_score`` keyed by ``job_id``."""
+    """
+    Computes ``skill_match_score`` for each ``job.job_id``.
+    Builds the scenario vocabulary unless ``vocab_skill_ids_ordered`` is provided.
+    """
+    job_list = list(jobs)
     weights = {int(k): float(v) for k, v in user_skill_weights.items()}
+    vocab: tuple[int, ...]
+    if vocab_skill_ids_ordered is None:
+        vocab = build_vocab_skill_ids_ordered(job_list, weights)
+    else:
+        vocab = tuple(sorted(set(vocab_skill_ids_ordered)))
     return {
-        job.job_id: skill_match_score(job, weights)
-        for job in jobs
+        job.job_id: skill_match_score(job, weights, vocab_skill_ids_ordered=vocab)
+        for job in job_list
     }
