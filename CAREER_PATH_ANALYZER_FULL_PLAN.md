@@ -1,6 +1,6 @@
 # Career Path & Skill Gap Analyzer — Backend Specification & Execution Plan
 
-Attach this file in a new Cursor chat (`@docs/CAREER_PATH_ANALYZER_FULL_PLAN.md`) when implementing.
+Attach this file in a new Cursor chat (`@docs/CAREER_PATH_ANALYZER_FULL_PLAN.md`) when implementing
 
 **How to run the plan:** Say exactly: **`Execute Step 1`** — complete that step fully before moving to Step 2. Repeat until all steps are done.
 
