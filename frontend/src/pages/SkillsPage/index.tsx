@@ -4,7 +4,6 @@ import PageLayout from "../../components/PageLayout";
 import BackButton from "../../components/BackButton";
 import PageHeader from "../../components/PageHeader";
 import PrimaryButton from "../../components/PrimaryButton";
-import AddSkillForm from "../../components/AddSkillForm";
 import SkillSearch from "../../components/SkillSearch";
 import SkillSlider from "../../components/SkillSlider";
 import { useAnalysis } from "../../context/AnalysisContext";
@@ -16,7 +15,6 @@ export default function SkillsPage() {
   const { skills, setSkills } = useAnalysis();
 
   const [localSkills, setLocalSkills] = useState<Skill[]>(skills);
-  const [customSkill, setCustomSkill] = useState("");
   const [catalogSkills, setCatalogSkills] = useState<CatalogSkill[]>([]);
   const [catalogLoading, setCatalogLoading] = useState(true);
 
@@ -46,7 +44,6 @@ export default function SkillsPage() {
     const trimmed = name.trim();
     if (!trimmed || activeNames.has(trimmed.toLowerCase())) return;
     setLocalSkills((prev) => [...prev, { name: trimmed, level: "Beginner" }]);
-    setCustomSkill("");
   }
 
   function handleNext() {
@@ -62,8 +59,6 @@ export default function SkillsPage() {
         subtitle="Select your proficiency level for each skill"
       />
 
-      <AddSkillForm value={customSkill} onChange={setCustomSkill} onAdd={addSkill} />
-
       <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6">
         <h2 className="font-semibold text-gray-900 dark:text-white mb-2">
           {catalogLoading ? "Loading skills..." : "Your Skills"}
@@ -73,7 +68,7 @@ export default function SkillsPage() {
 
         {localSkills.length === 0 && (
           <p className="text-sm text-gray-400 dark:text-gray-500 py-8 text-center">
-            Search and add skills above to get started.
+            Start typing above to search and add skills from the catalog.
           </p>
         )}
 

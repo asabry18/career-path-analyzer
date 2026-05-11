@@ -51,6 +51,11 @@ export interface SkillGap {
   courses: Course[];
 }
 
+export interface FrameworkChoice {
+  slotLabel: string;
+  alternatives: string[];
+}
+
 export interface CareerRecommendation {
   id: string;
   rank: number;
@@ -60,6 +65,7 @@ export interface CareerRecommendation {
   growth: string;
   matchScore: number;
   skillGaps: SkillGap[];
+  frameworkChoices: FrameworkChoice[];
 }
 
 // ── Backend API response types ──────────────────────────────────────

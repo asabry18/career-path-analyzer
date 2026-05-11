@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Layers } from "lucide-react";
 import PageLayout from "../../components/PageLayout";
 import BackButton from "../../components/BackButton";
 import PageHeader from "../../components/PageHeader";
@@ -99,13 +100,13 @@ export default function RecommendationsPage() {
       {selected.skillGaps.length > 0 && (
         <div className="mt-8 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-            Bridge Your Skill Gaps
+            Missing Mandatory Skills
           </h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-6">
             Skills you need to learn for this career
           </p>
 
-          <div className="space-y-8">
+          <div className="space-y-6">
             {selected.skillGaps.map((gap) => (
               <div key={gap.name}>
                 <div className="flex items-center justify-between mb-1">
@@ -138,27 +139,114 @@ export default function RecommendationsPage() {
         </div>
       )}
 
+      {selected.frameworkChoices.length > 0 && (
+        <div className="mt-8 rounded-2xl border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20 p-6">
+          <div className="flex items-center gap-2 mb-1">
+            <Layers size={20} className="text-blue-600 dark:text-blue-400" />
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+              Framework Choices
+            </h2>
+          </div>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+            This job requires one of the following frameworks — you only need to learn <strong>one</strong> from each group
+          </p>
+
+          <div className="space-y-5">
+            {selected.frameworkChoices.map((fc, i) => (
+              <div key={i}>
+                <p className="text-xs font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wide mb-2">
+                  {fc.slotLabel} — pick one
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {fc.alternatives.map((alt) => (
+                    <span
+                      key={alt}
+                      className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium border border-blue-300 dark:border-blue-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+                    >
+                      {alt}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {result.learning_plan.selected_courses.length > 0 && (
         <div className="mt-8 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">
             Recommended Learning Plan
           </h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 mb-6">
-            Minimum courses to cover your skill gaps across all recommended careers
+            The minimum set of courses (via Set Cover algorithm) to cover all your
+            missing skills across every recommended career
           </p>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-4">
             {result.learning_plan.selected_courses.map((course) => (
-              <CourseCard
+              <div
                 key={course.course_id}
-                course={{
-                  title: course.title,
-                  platform: course.provider,
-                  duration: `${course.skills.length} skill${course.skills.length !== 1 ? "s" : ""}`,
-                  url: course.url,
-                }}
-              />
+                className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 overflow-hidden"
+              >
+                <CourseCard
+                  course={{
+                    title: course.title,
+                    platform: course.provider,
+                    duration: `Covers ${course.skills.length} skill${course.skills.length !== 1 ? "s" : ""}`,
+                    url: course.url,
+                  }}
+                />
+                {course.skills.length > 0 && (
+                  <div className="px-5 pb-4 flex flex-wrap gap-2">
+                    {course.skills.map((sk) => (
+                      <span
+                        key={sk.skill_id}
+                        className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+                      >
+                        {sk.name}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
             ))}
           </div>
+
+          {result.learning_plan.covered_skills.length > 0 && (
+            <div className="mt-5 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                Skills covered by this plan:
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {result.learning_plan.covered_skills.map((sk) => (
+                  <span
+                    key={sk.skill_id}
+                    className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300"
+                  >
+                    ✓ {sk.name}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {result.learning_plan.uncovered_skills.length > 0 && (
+            <div className="mt-3">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                Skills not covered by available courses:
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {result.learning_plan.uncovered_skills.map((sk) => (
+                  <span
+                    key={sk.skill_id}
+                    className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300"
+                  >
+                    ✗ {sk.name}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
