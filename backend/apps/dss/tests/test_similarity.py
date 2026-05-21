@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 
-from apps.dss.constants import LEVEL_INTERMEDIATE, skill_weights_from_levels, validate_unit_weight
+from apps.dss.constants import LEVEL_AVERAGE, skill_weights_from_levels, validate_unit_weight
 from apps.dss.similarity import (
     build_vocab_index,
     build_vocab_skill_ids_ordered,
@@ -60,7 +60,7 @@ def test_or_slot_relaxed_binary_includes_framework_skills(vue_or_slot_job):
     voc = V(10, 101, 102, 103)
     bd = skill_match_breakdown(vue_or_slot_job, {}, vocab_skill_ids_ordered=voc)
     assert bd["job_binary_skill_count"] == 4
-    user = {10: 1.0, 103: LEVEL_INTERMEDIATE, 101: 0.0, 102: 0.0}
+    user = {10: 1.0, 103: LEVEL_AVERAGE, 101: 0.0, 102: 0.0}
     ix = build_vocab_index(voc)
     u = user_dense_vector(ix, len(voc), user)
     j = job_relaxed_binary_vector(vue_or_slot_job, ix, len(voc))
@@ -172,8 +172,8 @@ def test_skill_match_scores_for_jobs_shared_vocab():
 
 
 def test_constants_skill_weights_helpers():
-    w = skill_weights_from_levels({1: "intermediate", 2: 0.42})
-    assert w[1] == LEVEL_INTERMEDIATE
+    w = skill_weights_from_levels({1: "average", 2: 0.42})
+    assert w[1] == LEVEL_AVERAGE
     assert w[2] == pytest.approx(0.42)
     with pytest.raises(ValueError):
         validate_unit_weight(3.9)

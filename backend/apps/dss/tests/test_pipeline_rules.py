@@ -523,8 +523,8 @@ class TestFullScenarioFrontendUser:
     SCENARIO: A frontend user enters skills on the website.
 
     User skills:
-        HTML        = intermediate (0.6)
-        CSS         = intermediate (0.6)
+        HTML        = average (0.6)
+        CSS         = average (0.6)
         JavaScript  = advanced     (0.9)
         React       = advanced     (0.9)
 

@@ -27,8 +27,10 @@ from apps.catalog.models import (
 from apps.dss.constants import (
     CRITERIA_KEYS,
     LEVEL_ADVANCED,
+    LEVEL_ABOVE_AVERAGE,
     LEVEL_BEGINNER,
-    LEVEL_INTERMEDIATE,
+    LEVEL_AVERAGE,
+    LEVEL_UNDER_AVERAGE,
     skill_weights_from_levels,
 )
 from apps.dss.similarity import build_vocab_skill_ids_ordered, skill_match_breakdown
@@ -152,7 +154,7 @@ def test_similarity_preview(request):
     """
     POST JSON with either::
 
-        {"skills": [{"skill_id": 12, "level": "intermediate"}, ...], "limit_jobs": 15}
+        {"skills": [{"skill_id": 12, "level": "average"}, ...], "limit_jobs": 15}
 
     or raw weights::
 
@@ -251,7 +253,9 @@ def test_similarity_preview(request):
             "user_skills_resolved": resolved_rows,
             "level_to_weight_reference": {
                 "beginner": LEVEL_BEGINNER,
-                "intermediate": LEVEL_INTERMEDIATE,
+                "under average": LEVEL_UNDER_AVERAGE,
+                "average": LEVEL_AVERAGE,
+                "above average": LEVEL_ABOVE_AVERAGE,
                 "advanced": LEVEL_ADVANCED,
             },
             "scenario_vocab_size": len(vocab_tuple),
@@ -451,8 +455,10 @@ def test_pipeline_preview(request):
         "user_skills_resolved": resolved_rows,
         "level_to_weight_reference": {
             "beginner": LEVEL_BEGINNER,
-            "intermediate": LEVEL_INTERMEDIATE,
-            "advanced": LEVEL_ADVANCED,
+                "under average": LEVEL_UNDER_AVERAGE,
+                "average": LEVEL_AVERAGE,
+                "above average": LEVEL_ABOVE_AVERAGE,
+                "advanced": LEVEL_ADVANCED,
         },
         "scenario_vocab_size": len(vocab_tuple),
         "limit_jobs": limit_jobs,

@@ -2,6 +2,7 @@
 
 import pytest
 from rest_framework.test import APITestCase
+from django.contrib.auth import get_user_model
 
 from apps.catalog.models import (
     Course,
@@ -19,6 +20,13 @@ class TestAnalyzeEndpoint(APITestCase):
 
     @classmethod
     def setUpTestData(cls):
+        User = get_user_model()
+        cls.user = User.objects.create_user(
+            email="tester@example.com",
+            password="strong-password-123",
+            first_name="Test",
+            last_name="User",
+        )
         cls.html = Skill.objects.create(name="HTML")
         cls.css = Skill.objects.create(name="CSS")
         cls.js = Skill.objects.create(name="JavaScript")
@@ -51,12 +59,15 @@ class TestAnalyzeEndpoint(APITestCase):
         JobSkill.objects.create(job=cls.backend, skill=cls.python)
         JobSkill.objects.create(job=cls.backend, skill=cls.django_skill)
 
+    def setUp(self):
+        self.client.force_authenticate(user=self.user)
+
     def test_valid_request_returns_200(self):
         payload = {
             "skills": [
                 {"name": "HTML", "level": "Advanced"},
-                {"name": "CSS", "level": "Intermediate"},
-                {"name": "JavaScript", "level": "Intermediate"},
+                {"name": "CSS", "level": "Average"},
+                {"name": "JavaScript", "level": "Average"},
                 {"name": "React", "level": "Beginner"},
             ],
             "priorities": ["match", "salary", "demand", "learn"],

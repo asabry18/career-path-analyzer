@@ -7,4 +7,5 @@ urlpatterns = [
     path("skills/", api_views.SkillListView.as_view(), name="catalog-skills"),
     path("jobs/", api_views.JobListView.as_view(), name="catalog-jobs"),
     path("courses/", api_views.CourseListView.as_view(), name="catalog-courses"),
+    path("insights/", api_views.catalog_insights, name="catalog-insights"),
 ]

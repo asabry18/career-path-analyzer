@@ -11,23 +11,36 @@ CRITERIA_KEYS: tuple[str, ...] = (
     "learning_effort",
 )
 
-LEVEL_BEGINNER = 0.3
-LEVEL_INTERMEDIATE = 0.6
-LEVEL_ADVANCED = 0.9
+LEVEL_BEGINNER = 0.2
+LEVEL_UNDER_AVERAGE = 0.4
+LEVEL_AVERAGE = 0.6
+LEVEL_ABOVE_AVERAGE = 0.8
+LEVEL_ADVANCED = 1.0
 LEVEL_UNSPECIFIED = 0.0
 
-SkillLevelLiteral = Literal["beginner", "intermediate", "advanced"]
+SkillLevelLiteral = Literal[
+    "beginner",
+    "under average",
+    "average",
+    "above average",
+    "advanced",
+]
 
 _SKILL_LEVEL_WEIGHTS: Mapping[str, float] = {
     "beginner": LEVEL_BEGINNER,
-    "intermediate": LEVEL_INTERMEDIATE,
+    "under average": LEVEL_UNDER_AVERAGE,
+    "average": LEVEL_AVERAGE,
+    "above average": LEVEL_ABOVE_AVERAGE,
     "advanced": LEVEL_ADVANCED,
+    "advance": LEVEL_ADVANCED,
+    "intermediate": LEVEL_AVERAGE,
 }
 
 
 def weight_from_skill_level(level: str | SkillLevelLiteral) -> float:
     """Map a named level string to its catalog weight."""
-    key = level.strip().lower()
+    key = level.strip().lower().replace("_", " ").replace("-", " ")
+    key = " ".join(key.split())
     try:
         return float(_SKILL_LEVEL_WEIGHTS[key])
     except KeyError as exc:

@@ -25,7 +25,15 @@ def map_priority_ids_to_criteria(priority_ids: list[str]) -> list[str]:
 
 class SkillInputSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=255)
-    level = serializers.ChoiceField(choices=["Beginner", "Intermediate", "Advanced"])
+    level = serializers.ChoiceField(
+        choices=[
+            "Beginner",
+            "Under Average",
+            "Average",
+            "Above Average",
+            "Advanced",
+        ]
+    )
 
 
 class AnalyzeRequestSerializer(serializers.Serializer):

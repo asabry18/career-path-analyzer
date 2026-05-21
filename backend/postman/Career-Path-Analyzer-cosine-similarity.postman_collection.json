@@ -131,7 +131,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"skills\": [\n    { \"skill_id\": {{skill_id_1}}, \"level\": \"intermediate\" },\n    { \"skill_id\": {{skill_id_2}}, \"level\": \"advanced\" }\n  ],\n  \"limit_jobs\": 15\n}"
+              "raw": "{\n  \"skills\": [\n    { \"skill_id\": {{skill_id_1}}, \"level\": \"average\" },\n    { \"skill_id\": {{skill_id_2}}, \"level\": \"advanced\" }\n  ],\n  \"limit_jobs\": 15\n}"
             },
             "url": "{{base_url}}/api/test/similarity-preview/"
           }
@@ -160,7 +160,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"skills\": [\n    { \"skill_id\": {{skill_id_1}}, \"level\": \"beginner\" },\n    { \"skill_id\": {{skill_id_2}}, \"level\": \"intermediate\" },\n    { \"skill_id\": {{skill_id_3}}, \"level\": \"advanced\" }\n  ],\n  \"limit_jobs\": 40\n}"
+              "raw": "{\n  \"skills\": [\n    { \"skill_id\": {{skill_id_1}}, \"level\": \"beginner\" },\n    { \"skill_id\": {{skill_id_2}}, \"level\": \"average\" },\n    { \"skill_id\": {{skill_id_3}}, \"level\": \"advanced\" }\n  ],\n  \"limit_jobs\": 40\n}"
             },
             "url": "{{base_url}}/api/test/similarity-preview/"
           }
@@ -238,7 +238,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"skills\": [\n    { \"skill_id\": {{skill_id_1}}, \"level\": \"intermediate\" },\n    { \"skill_id\": {{skill_id_2}}, \"level\": \"advanced\" }\n  ],\n  \"pairwise\": [\n    { \"a\": \"skill_match\", \"b\": \"salary\", \"value\": 3 },\n    { \"a\": \"skill_match\", \"b\": \"demand\", \"value\": 5 },\n    { \"a\": \"skill_match\", \"b\": \"learning_effort\", \"value\": 7 },\n    { \"a\": \"salary\", \"b\": \"demand\", \"value\": 3 },\n    { \"a\": \"salary\", \"b\": \"learning_effort\", \"value\": 5 },\n    { \"a\": \"demand\", \"b\": \"learning_effort\", \"value\": 3 }\n  ],\n  \"threshold\": 0.4,\n  \"limit_jobs\": 40\n}"
+              "raw": "{\n  \"skills\": [\n    { \"skill_id\": {{skill_id_1}}, \"level\": \"average\" },\n    { \"skill_id\": {{skill_id_2}}, \"level\": \"advanced\" }\n  ],\n  \"pairwise\": [\n    { \"a\": \"skill_match\", \"b\": \"salary\", \"value\": 3 },\n    { \"a\": \"skill_match\", \"b\": \"demand\", \"value\": 5 },\n    { \"a\": \"skill_match\", \"b\": \"learning_effort\", \"value\": 7 },\n    { \"a\": \"salary\", \"b\": \"demand\", \"value\": 3 },\n    { \"a\": \"salary\", \"b\": \"learning_effort\", \"value\": 5 },\n    { \"a\": \"demand\", \"b\": \"learning_effort\", \"value\": 3 }\n  ],\n  \"threshold\": 0.4,\n  \"limit_jobs\": 40\n}"
             },
             "url": "{{base_url}}/api/test/pipeline-preview/"
           }
@@ -351,7 +351,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"skills\": [\n    { \"name\": \"HTML\", \"level\": \"Intermediate\" },\n    { \"name\": \"CSS\", \"level\": \"Intermediate\" },\n    { \"name\": \"JavaScript\", \"level\": \"Advanced\" },\n    { \"name\": \"React\", \"level\": \"Advanced\" }\n  ],\n  \"priorities\": [\"demand\", \"learn\", \"match\", \"salary\"],\n  \"threshold\": 0.1\n}"
+              "raw": "{\n  \"skills\": [\n    { \"name\": \"HTML\", \"level\": \"Average\" },\n    { \"name\": \"CSS\", \"level\": \"Average\" },\n    { \"name\": \"JavaScript\", \"level\": \"Advanced\" },\n    { \"name\": \"React\", \"level\": \"Advanced\" }\n  ],\n  \"priorities\": [\"demand\", \"learn\", \"match\", \"salary\"],\n  \"threshold\": 0.4\n}"
             },
             "url": "{{base_url}}/api/analyze/"
           }
@@ -381,7 +381,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"skills\": [\n    { \"name\": \"HTML\", \"level\": \"Intermediate\" },\n    { \"name\": \"CSS\", \"level\": \"Intermediate\" },\n    { \"name\": \"JavaScript\", \"level\": \"Advanced\" },\n    { \"name\": \"React\", \"level\": \"Advanced\" }\n  ],\n  \"priorities\": [\"demand\", \"learn\", \"match\", \"salary\"],\n  \"threshold\": 0.0\n}"
+              "raw": "{\n  \"skills\": [\n    { \"name\": \"HTML\", \"level\": \"Average\" },\n    { \"name\": \"CSS\", \"level\": \"Average\" },\n    { \"name\": \"JavaScript\", \"level\": \"Advanced\" },\n    { \"name\": \"React\", \"level\": \"Advanced\" }\n  ],\n  \"priorities\": [\"demand\", \"learn\", \"match\", \"salary\"],\n  \"threshold\": 0.0\n}"
             },
             "url": "{{base_url}}/api/analyze/"
           }
@@ -414,7 +414,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"skills\": [\n    { \"name\": \"HTML\", \"level\": \"Intermediate\" },\n    { \"name\": \"CSS\", \"level\": \"Intermediate\" },\n    { \"name\": \"JavaScript\", \"level\": \"Advanced\" },\n    { \"name\": \"React\", \"level\": \"Advanced\" }\n  ],\n  \"priorities\": [\"match\", \"learn\", \"demand\", \"salary\"],\n  \"threshold\": 0.1\n}"
+              "raw": "{\n  \"skills\": [\n    { \"name\": \"HTML\", \"level\": \"Average\" },\n    { \"name\": \"CSS\", \"level\": \"Average\" },\n    { \"name\": \"JavaScript\", \"level\": \"Advanced\" },\n    { \"name\": \"React\", \"level\": \"Advanced\" }\n  ],\n  \"priorities\": [\"match\", \"learn\", \"demand\", \"salary\"],\n  \"threshold\": 0.4\n}"
             },
             "url": "{{base_url}}/api/analyze/"
           }
