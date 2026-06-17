@@ -118,7 +118,7 @@ export const MOCK_RECOMMENDATIONS: CareerRecommendation[] = [
       {
         name: "TensorFlow",
         current: "Beginner",
-        target: "Intermediate",
+        target: "Average",
         progress: 10,
         courses: [
           {
@@ -157,7 +157,7 @@ export const MOCK_RECOMMENDATIONS: CareerRecommendation[] = [
       {
         name: "AWS",
         current: "Beginner",
-        target: "Intermediate",
+        target: "Average",
         progress: 5,
         courses: [
           {
@@ -177,7 +177,7 @@ export const MOCK_RECOMMENDATIONS: CareerRecommendation[] = [
       {
         name: "Kubernetes",
         current: "Beginner",
-        target: "Intermediate",
+        target: "Average",
         progress: 5,
         courses: [
           {

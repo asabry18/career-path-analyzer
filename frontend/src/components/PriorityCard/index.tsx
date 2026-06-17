@@ -16,13 +16,12 @@ const PRIORITY_LABELS = [
   "Low Priority",
 ];
 
-const POSITION_WEIGHTS = [10, 7, 4, 1];
-
 interface PriorityCardProps {
   priority: Priority;
   index: number;
   total: number;
   isDragging: boolean;
+  weight: number;
   onMoveUp: () => void;
   onMoveDown: () => void;
   onDragStart: () => void;
@@ -35,6 +34,7 @@ export default function PriorityCard({
   index,
   total,
   isDragging,
+  weight,
   onMoveUp,
   onMoveDown,
   onDragStart,
@@ -83,7 +83,7 @@ export default function PriorityCard({
             {PRIORITY_LABELS[index]}
           </span>
           <span className="priority-card__weight">
-            Weight: {POSITION_WEIGHTS[index]}/10
+            Weight: {(weight * 100).toFixed(1)}%
           </span>
         </div>
       </div>

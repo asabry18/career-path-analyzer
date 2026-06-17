@@ -1,23 +1,9 @@
-import { createContext, useContext, useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import type { ReactNode } from "react";
 import type { Skill, Priority, AnalyzeResponse } from "../types";
 import { analyze } from "../api/client";
 import { DEFAULT_PRIORITIES } from "../data/priorities";
-
-interface AnalysisState {
-  skills: Skill[];
-  priorities: Priority[];
-  result: AnalyzeResponse | null;
-  loading: boolean;
-  error: string | null;
-
-  setSkills: (skills: Skill[]) => void;
-  setPriorities: (priorities: Priority[]) => void;
-  runAnalysis: (threshold?: number) => Promise<void>;
-  clearResult: () => void;
-}
-
-const AnalysisContext = createContext<AnalysisState | null>(null);
+import { AnalysisContext } from "./analysisContextStore";
 
 export function AnalysisProvider({ children }: { children: ReactNode }) {
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -27,7 +13,7 @@ export function AnalysisProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null);
 
   const runAnalysis = useCallback(
-    async (threshold = 0.1) => {
+    async (threshold = 0.3) => {
       setLoading(true);
       setError(null);
       setResult(null);
@@ -39,6 +25,7 @@ export function AnalysisProvider({ children }: { children: ReactNode }) {
           threshold,
         });
         setResult(resp);
+        return true;
       } catch (err: unknown) {
         if (
           err &&
@@ -56,6 +43,7 @@ export function AnalysisProvider({ children }: { children: ReactNode }) {
         } else {
           setError("An unexpected error occurred");
         }
+        return false;
       } finally {
         setLoading(false);
       }
@@ -85,11 +73,4 @@ export function AnalysisProvider({ children }: { children: ReactNode }) {
       {children}
     </AnalysisContext.Provider>
   );
-}
-
-export function useAnalysis(): AnalysisState {
-  const ctx = useContext(AnalysisContext);
-  if (!ctx)
-    throw new Error("useAnalysis must be used within <AnalysisProvider>");
-  return ctx;
 }

@@ -6,7 +6,7 @@ import PageHeader from "../../components/PageHeader";
 import PrimaryButton from "../../components/PrimaryButton";
 import SkillSearch from "../../components/SkillSearch";
 import SkillSlider from "../../components/SkillSlider";
-import { useAnalysis } from "../../context/AnalysisContext";
+import { useAnalysis } from "../../context/useAnalysis";
 import { fetchSkills } from "../../api/client";
 import type { Skill, SkillLevel, CatalogSkill } from "../../types";
 
@@ -17,6 +17,7 @@ export default function SkillsPage() {
   const [localSkills, setLocalSkills] = useState<Skill[]>(skills);
   const [catalogSkills, setCatalogSkills] = useState<CatalogSkill[]>([]);
   const [catalogLoading, setCatalogLoading] = useState(true);
+  const [formHint, setFormHint] = useState<string | null>(null);
 
   useEffect(() => {
     fetchSkills()
@@ -26,27 +27,42 @@ export default function SkillsPage() {
   }, []);
 
   const activeNames = new Set(localSkills.map((s) => s.name.toLowerCase()));
+  const catalogSet = new Set(catalogSkills.map((s) => s.name.toLowerCase()));
   const availableSuggestions = catalogSkills
     .map((s) => s.name)
     .filter((name) => !activeNames.has(name.toLowerCase()));
+  const canProceed =
+    localSkills.length > 0 && localSkills.every((s) => Boolean(s.level));
 
   function updateLevel(name: string, level: SkillLevel) {
+    setFormHint(null);
     setLocalSkills((prev) =>
       prev.map((s) => (s.name === name ? { ...s, level } : s))
     );
   }
 
   function removeSkill(name: string) {
+    setFormHint(null);
     setLocalSkills((prev) => prev.filter((s) => s.name !== name));
   }
 
   function addSkill(name: string) {
     const trimmed = name.trim();
-    if (!trimmed || activeNames.has(trimmed.toLowerCase())) return;
+    const normalized = trimmed.toLowerCase();
+    if (!trimmed || activeNames.has(normalized)) return;
+    if (!catalogSet.has(normalized)) {
+      setFormHint("Choose a skill from the catalog list.");
+      return;
+    }
+    setFormHint(null);
     setLocalSkills((prev) => [...prev, { name: trimmed, level: "Beginner" }]);
   }
 
   function handleNext() {
+    if (!canProceed) {
+      setFormHint("Add at least one skill and choose a level for each.");
+      return;
+    }
     setSkills(localSkills);
     navigate("/priorities");
   }
@@ -65,6 +81,9 @@ export default function SkillsPage() {
         </h2>
 
         <SkillSearch suggestions={availableSuggestions} onSelect={addSkill} />
+        <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+          Select skills from the catalog list and choose a level for each one.
+        </p>
 
         {localSkills.length === 0 && (
           <p className="text-sm text-gray-400 dark:text-gray-500 py-8 text-center">
@@ -97,8 +116,14 @@ export default function SkillsPage() {
       <PrimaryButton
         label="Set Priorities"
         onClick={handleNext}
-        disabled={localSkills.length === 0}
+        disabled={!canProceed}
       />
+
+      {formHint && (
+        <p className="text-center text-sm text-red-500 dark:text-red-400 mt-3">
+          {formHint}
+        </p>
+      )}
     </PageLayout>
   );
 }

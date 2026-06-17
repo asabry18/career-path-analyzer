@@ -7,7 +7,7 @@ import PageHeader from "../../components/PageHeader";
 import CareerCard from "../../components/CareerCard";
 import CareerDetail from "../../components/CareerDetail";
 import CourseCard from "../../components/CourseCard";
-import { useAnalysis } from "../../context/AnalysisContext";
+import { useAnalysis } from "../../context/useAnalysis";
 import { mapResultToRecommendations } from "../../utils/mappers";
 import "./RecommendationsPage.css";
 
@@ -212,24 +212,6 @@ export default function RecommendationsPage() {
             ))}
           </div>
 
-          {result.learning_plan.covered_skills.length > 0 && (
-            <div className="mt-5 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                Skills covered by this plan:
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {result.learning_plan.covered_skills.map((sk) => (
-                  <span
-                    key={sk.skill_id}
-                    className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300"
-                  >
-                    ✓ {sk.name}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
           {result.learning_plan.uncovered_skills.length > 0 && (
             <div className="mt-3">
               <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
@@ -261,8 +243,8 @@ export default function RecommendationsPage() {
                 <tr className="border-b border-gray-200 dark:border-gray-700">
                   <th className="py-2 px-3 text-left text-gray-500 dark:text-gray-400 font-medium">#</th>
                   <th className="py-2 px-3 text-left text-gray-500 dark:text-gray-400 font-medium">Career</th>
-                  <th className="py-2 px-3 text-right text-gray-500 dark:text-gray-400 font-medium">Match</th>
-                  <th className="py-2 px-3 text-right text-gray-500 dark:text-gray-400 font-medium">TOPSIS</th>
+                  <th className="py-2 px-3 text-right text-gray-500 dark:text-gray-400 font-medium">Skill Match</th>
+                  <th className="py-2 px-3 text-right text-gray-500 dark:text-gray-400 font-medium">Fit Score</th>
                   <th className="py-2 px-3 text-right text-gray-500 dark:text-gray-400 font-medium">Salary</th>
                   <th className="py-2 px-3 text-right text-gray-500 dark:text-gray-400 font-medium">Demand</th>
                   <th className="py-2 px-3 text-right text-gray-500 dark:text-gray-400 font-medium">Effort</th>

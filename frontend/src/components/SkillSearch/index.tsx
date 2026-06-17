@@ -18,10 +18,6 @@ export default function SkillSearch({ suggestions, onSelect }: SkillSearchProps)
       )
     : [];
 
-  const exactMatch = suggestions.some(
-    (s) => s.toLowerCase() === trimmed.toLowerCase()
-  );
-
   function handleSelect(name: string) {
     onSelect(name);
     setQuery("");
@@ -29,19 +25,10 @@ export default function SkillSearch({ suggestions, onSelect }: SkillSearchProps)
     inputRef.current?.focus();
   }
 
-  function handleAddCustom() {
-    if (trimmed) {
-      onSelect(trimmed);
-      setQuery("");
-    }
-  }
-
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === "Enter" && trimmed) {
       if (filtered.length > 0) {
         handleSelect(filtered[0]);
-      } else {
-        handleAddCustom();
       }
     }
   }
@@ -87,20 +74,8 @@ export default function SkillSearch({ suggestions, onSelect }: SkillSearchProps)
             ))
           ) : (
             <div className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
-              No matching skill found in catalog.
+              No matching skill found in the catalog list.
             </div>
-          )}
-
-          {trimmed && !exactMatch && (
-            <button
-              onMouseDown={handleAddCustom}
-              className="w-full text-left px-4 py-2.5 text-sm font-medium text-gray-900 dark:text-white
-                hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer
-                border-t border-gray-200 dark:border-gray-700 rounded-b-xl flex items-center gap-2"
-            >
-              <Plus size={14} className="flex-shrink-0" />
-              Add &quot;{trimmed}&quot; as custom skill
-            </button>
           )}
         </div>
       )}

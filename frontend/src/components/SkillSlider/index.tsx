@@ -6,7 +6,13 @@ interface SkillSliderProps {
   onChange: (level: SkillLevel) => void;
 }
 
-const LEVELS: SkillLevel[] = ["Beginner", "Intermediate", "Advanced"];
+const LEVELS: SkillLevel[] = [
+  "Beginner",
+  "Under Average",
+  "Average",
+  "Above Average",
+  "Advanced",
+];
 
 export default function SkillSlider({ name, level, onChange }: SkillSliderProps) {
   const index = LEVELS.indexOf(level);
@@ -25,7 +31,7 @@ export default function SkillSlider({ name, level, onChange }: SkillSliderProps)
       <input
         type="range"
         min={0}
-        max={2}
+        max={4}
         step={1}
         value={index}
         onChange={handleChange}

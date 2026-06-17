@@ -312,7 +312,7 @@ def test_pipeline_preview(request):
         {
           "skills": [...] or "weights": {"12": 0.6},
           "pairwise": [ { "a": "skill_match", "b": "salary", "value": 3 }, ... 6 total ],
-          "threshold": 0.4,
+          "threshold": 0.3,
           "limit_jobs": 25
         }
 
@@ -331,7 +331,7 @@ def test_pipeline_preview(request):
     except (TypeError, ValueError):
         return JsonResponse({"detail": "limit_jobs must be an integer"}, status=400)
 
-    threshold_raw = body.get("threshold", 0.4)
+    threshold_raw = body.get("threshold", 0.3)
     try:
         threshold = float(threshold_raw)
     except (TypeError, ValueError):

@@ -24,6 +24,12 @@ class Job(models.Model):
     demand_score = models.PositiveIntegerField(
         help_text="Demand indicator (e.g. frequency rank from source data).",
     )
+    sector = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="Market sector this job belongs to.",
+    )
 
     class Meta:
         ordering = ["title"]

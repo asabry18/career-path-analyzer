@@ -1,4 +1,4 @@
-import { Building2, DollarSign, TrendingUp } from "lucide-react";
+import { Briefcase, DollarSign, BarChart3 } from "lucide-react";
 import type { Stats } from "../../types";
 
 interface StatsCardsProps {
@@ -6,9 +6,9 @@ interface StatsCardsProps {
 }
 
 const iconMap = [
-  { key: "openingPositions" as const, label: "Opening Positions", Icon: Building2, color: "text-gray-500 dark:text-gray-400" },
-  { key: "averageSalary" as const, label: "Average Salary", Icon: DollarSign, color: "text-emerald-500" },
-  { key: "growthRate" as const, label: "Growth Rate", Icon: TrendingUp, color: "text-primary" },
+  { key: "jobCount" as const, label: "Jobs in Catalog", Icon: Briefcase, color: "text-gray-500 dark:text-gray-400" },
+  { key: "medianSalary" as const, label: "Median Salary", Icon: DollarSign, color: "text-emerald-500" },
+  { key: "salaryIqr" as const, label: "Salary IQR", Icon: BarChart3, color: "text-primary" },
 ];
 
 export default function StatsCards({ stats }: StatsCardsProps) {

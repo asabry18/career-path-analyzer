@@ -149,7 +149,7 @@ def run(
     jobs: Sequence[JobCatalogEntry],
     user_weights: Mapping[int, float],
     pairwise: Sequence[PairwiseEntry | Mapping[str, object]],
-    threshold: float = 0.4,
+    threshold: float = 0.3,
     courses: Sequence[CourseInfo] = (),
 ) -> PipelineResult:
     """

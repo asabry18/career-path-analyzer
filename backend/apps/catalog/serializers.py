@@ -23,6 +23,7 @@ class JobListSerializer(serializers.ModelSerializer):
             "description",
             "avg_salary",
             "demand_score",
+            "sector",
             "mandatory_skills",
             "framework_slots",
         )

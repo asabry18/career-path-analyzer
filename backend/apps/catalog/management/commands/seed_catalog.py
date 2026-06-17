@@ -17,7 +17,7 @@ from apps.catalog.models import (
 
 DEFAULT_FILENAMES = {
     "jobs_skills": "jobs skills.csv",
-    "jobs": "updated_with_frameworks_processed.csv",
+    "jobs": "jobs_with_sector.csv",
     "courses": "Courses.csv",
 }
 
@@ -48,6 +48,25 @@ def parse_skills_list(cell: str) -> list[str]:
         if label:
             labels.append(label)
     return labels
+
+
+def parse_sector(cell: str) -> str | None:
+    cell = (cell or "").strip()
+    if not cell:
+        return None
+    if cell.startswith("[") and cell.endswith("]"):
+        try:
+            value = ast.literal_eval(cell)
+            if isinstance(value, list) and value:
+                cell = str(value[0])
+            elif isinstance(value, str):
+                cell = value
+        except (SyntaxError, ValueError):
+            cell = cell[1:-1].strip().strip("'\"")
+    parts = [p.strip() for p in cell.split(",") if p.strip()]
+    if not parts:
+        return None
+    return ", ".join(parts)
 
 
 def split_frameworks(cell: str) -> list[str]:
@@ -166,6 +185,7 @@ class Command(BaseCommand):
                 description = "\n".join(description_parts)
 
                 skills = parse_skills_list(row.get("skills", ""))
+                sector = parse_sector(row.get("Sector") or row.get("sector") or "")
 
                 job, _ = Job.objects.update_or_create(
                     title=title,
@@ -173,6 +193,7 @@ class Command(BaseCommand):
                         "demand_score": demand,
                         "avg_salary": avg_salary,
                         "description": description,
+                        "sector": sector,
                     },
                 )
                 jobs_touched += 1

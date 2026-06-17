@@ -1,290 +1,300 @@
-# Career Path & Skill Gap Analyzer — Backend Specification & Execution Plan
-
-Attach this file in a new Cursor chat (`@docs/CAREER_PATH_ANALYZER_FULL_PLAN.md`) when implementing
-
-**How to run the plan:** Say exactly: **`Execute Step 1`** — complete that step fully before moving to Step 2. Repeat until all steps are done.
+# Career Path & Skill Gap Analyzer — Project Overview & Status
 
 ---
 
-## Part A — Project description and purpose
+## What this project is
 
-### Problem
+A **full-stack Decision Support System (DSS)** that helps students and graduates discover career paths that fit their skills, compare roles on multiple criteria (match, salary, market demand, learning effort), and get a **minimum set of courses** to close skill gaps.
 
-Many students and graduates are unsure which career path fits them. There is often a gap between the skills they have and what employers ask for; salary and demand differ across markets. People may waste effort on skills that do not align with roles they could realistically pursue.
+| Layer | Stack | Role |
+|-------|--------|------|
+| **Frontend** | React, TypeScript, Vite, Tailwind, Axios | Collect skills + priority ranking, call APIs, show ranked careers, gaps, framework choices, learning plan |
+| **Backend** | Django 5, Django REST Framework, PostgreSQL | Catalog CRUD via API, stateless analysis endpoint |
+| **DSS core** | Pure Python (`apps/dss/`) — NumPy, SciPy, PuLP | Similarity → threshold → AHP → TOPSIS → Set Cover (no Django imports) |
 
-### Purpose
-
-Build the **backend** for a web-based **Decision Support System** that:
-
-1. Uses **catalog data** stored in PostgreSQL: job roles (with salary and demand indicators), **mandatory** skills per job, **framework alternatives** (OR slots), skills taxonomy, and courses linked to skills.
-2. Accepts **stateless** requests: the user’s chosen skills with **levels** (mapped to numeric weights), plus **pairwise preferences** between decision criteria.
-3. Computes **skill match** combining **mandatory** requirements with **framework slots** where **only one** of several listed frameworks is needed (see below — not naive cosine across all framework dimensions).
-4. Filters weak matches, assigns **career clusters** with **k-Means**, builds a **multi-criteria decision matrix**, derives weights with **AHP**, ranks alternatives with **TOPSIS**, lists mandatory gaps and **optional framework choices**, and solves **Set Cover** for courses.
-
-### Framework columns in the dataset (OR semantics)
-
-Some jobs include a **frameworks** field (e.g. React, Vue, Angular for front-end roles). Employers typically expect **one** of those stacks, **not all**.
-
-**Matching**
-
-- **`JobSkill` rows:** AND semantics — each listed skill contributes like a normal requirement to similarity (weighted user vs mandatory binary vector).
-- **`JobFrameworkAlternative` rows** (same `job_id` + `slot_index` = one OR slot): contribution uses \(\max_{t \in \text{slot}} u_t\) — **one score per slot**, not a sum over every alternative.
-- Each framework slot counts as **one logical requirement** when normalizing so having Vue alone satisfies “needs a JS framework” like having Python satisfies “needs Python.”
-
-**Recommendations**
-
-- If \(\max_{t \in \text{slot}} u_t = 0\): count **one** unit toward **learning_effort** for that slot (not one per framework).
-- Return **`optional_frameworks`** on each ranked job: list every alternative in unsatisfied slots so the UI can offer “pick any one path” plus courses per skill where available.
-
-### Scope boundaries
-
-| In scope | Out of scope (v1) |
-|----------|-------------------|
-| REST API consumed by React/TS frontend | User accounts, JWT sessions |
-| Persist **catalog**: jobs, skills, mandatory links, framework alternatives, courses | Saving analysis history per visitor |
-| Stateless `POST /api/analyze/` | Job scraping pipelines |
+**In scope:** Stateless analysis, seeded job/skill/course catalog, REST API, integrated UI.  
+**Out of scope (v1):** User accounts, saved analysis history, job scraping.
 
 ---
 
-## Part B — Algorithms and tools
+## Problem & purpose
 
-### Processing pipeline (runtime order)
+Many graduates are unsure which career fits them. There is often a gap between **skills they have** and **what employers require**; salary and demand vary by role. This system:
 
-1. Build **skill vocabulary** from every skill appearing in `JobSkill` or **`JobFrameworkAlternative`**.
-2. For each job load **mandatory** skill IDs (`JobSkill`) and **framework slots** (`JobFrameworkAlternative` grouped by `slot_index`).
-3. Build **user vector** \(u\): \(u_s =\) mapped weight if declared, else \(0\).
-4. **Skill match score:** combine (a) cosine-style alignment on **mandatory-only** dimensions with (b) **per-slot max**: for each framework slot add \(\max_{t \in \text{slot}} u_t\) as fulfilling **one** logical requirement; normalize so each slot equals **one** unit of demand (implement precisely in `similarity.py`, unit-tested — includes guards for zero norms).
-5. **Threshold:** drop jobs below cutoff on **skill_match_score**.
-6. **k-Means:** job rows as binary vectors over skills — **1** if skill is mandatory **or** appears in any framework alternative (relaxed bag for clustering only; document in thesis). Assign user’s vector in same space for centroid distance.
-7. **Decision matrix:** SkillMatch | Salary | Demand | LearningEffort — where LearningEffort = *(mandatory skills missing)* + *(framework slots still completely unmatched)*.
-8. **AHP:** build \(4\times4\) pairwise matrix from six comparisons → principal eigenvector → normalized weights; compute **consistency ratio** \(CR\) (warn if \(CR > 0.1\)).
-9. **TOPSIS:** weighted normalized matrix → positive/negative ideal → Euclidean distances → closeness \(C_i \in [0,1]\); higher is better.
-10. **Gaps:** mandatory skills absent from user → listed under **`missing_skills`**. Framework slots with \(\max_{t\in\text{slot}} u_t = 0\) → **`optional_frameworks`** listing every alternative skill id/name (user picks one track).
-11. Union of skills still missing for Set Cover → **Set Cover** minimize \(\sum x_c\) (cover mandatory gaps; optionally include **one** representative skill per empty framework slot — document chosen rule in code).
-
-### User skill level → weight mapping
-
-Centralize in `apps/dss/constants.py`:
-
-| Level | Weight |
-|-------|--------|
-| beginner | `0.3` |
-| intermediate | `0.6` |
-| advanced | `0.9` |
-| not declared | `0.0` |
-
-Accept numeric floats from the frontend if needed; validate range `[0, 1]`.
-
-### Decision criteria keys
-
-`skill_match`, `salary`, `demand`, `learning_effort` — used in pairwise payloads and internally.
-
-### Recommended libraries
-
-| Need | Library | Role |
-|------|---------|------|
-| Vector ops, cosine, normalization | **NumPy** | Core linear algebra |
-| Largest eigenpair for AHP | **SciPy** (`scipy.linalg.eig`) or NumPy power iteration | Weights + \(\lambda_{\max}\) for \(CR\) |
-| k-Means | **scikit-learn** (`sklearn.cluster.KMeans`) | Cluster job vectors |
-| Set Cover IP | **PuLP** (`pulp`) | CBC solver bundled |
-| Web framework | **Django ≥ 5**, **djangorestframework** | API |
-| DB adapter | **psycopg** (`psycopg[binary]`) | PostgreSQL |
-| API schema UI | **drf-spectacular** | OpenAPI / Swagger |
-| CORS | **django-cors-headers** | Frontend on another origin |
-| Testing | **pytest**, **pytest-django**, **factory-boy** | Unit + API tests |
-
-Cosine-style algebra uses **NumPy**; mandatory vs framework-slot logic stays explicit in code so OR semantics are not lost inside a single dense dot product.
+1. Stores a **catalog** of jobs (salary, demand), mandatory skills, **framework alternatives** (OR slots), and courses linked to skills.
+2. Accepts the user’s **skills with proficiency levels** and **ranked priorities** among four criteria.
+3. Computes **skill match** (cosine similarity), filters weak matches, ranks survivors with **AHP + TOPSIS**, lists **gaps** and **optional frameworks**, and recommends a **Set Cover** learning plan.
 
 ---
 
-## Part C — Database catalog
+## Implementation status (summary)
 
-Six reference tables (framework OR slots):
+| Step | Area | Status | Notes |
+|------|------|--------|--------|
+| 1 | Django scaffold, settings, deps | **Done** | `backend/`, `config/settings/`, `requirements.txt`, `.env.example` |
+| 2 | Apps & routing | **Done** | `catalog`, `analysis`, `apps/dss` |
+| 3 | Catalog models & migrations | **Done** | Six models including `JobFrameworkAlternative` |
+| 4 | Seed data | **Done** | `seed_catalog` from CSV in `backend/data/seed/` |
+| 5 | Similarity | **Done** | Dense cosine on unified vocabulary; relaxed job binary vector (mandatory + all framework alts) |
+| 6 | k-Means clustering | **Skipped** | Not in pipeline; flow goes similarity → AHP → TOPSIS directly |
+| 7 | AHP & TOPSIS | **Done** | AHP eigenvector + CR; TOPSIS with **min–max** normalization, `learning_effort` as cost |
+| 8 | Set Cover & pipeline | **Done** | `pipeline.py` orchestrates full flow; PuLP ILP |
+| 9 | Catalog REST | **Done** | `GET /api/skills/`, `/api/jobs/`, `/api/courses/` |
+| 10 | Analyze REST | **Done** | `POST /api/analyze/`; priorities → pairwise via ranking rules |
+| 11 | Admin & OpenAPI | **Partial** | `drf-spectacular` in settings; **Django admin models not registered**; schema URL not wired in root `urls.py` |
+| 12 | Docs & polish | **Partial** | Postman collection + pytest; **no root/backend README**; frontend README is Vite template only |
+| — | Frontend ↔ API | **Done** | Axios, `AnalysisContext`, skills search, recommendations UI |
 
-| Model | Fields (conceptual) |
-|-------|---------------------|
-| **Skill** | `id`, `name` (unique) |
-| **Job** | `id`, `title`, `description`, `avg_salary`, `demand_score` |
-| **JobSkill** | FK job, FK skill — **mandatory** requirement (AND) |
-| **JobFrameworkAlternative** | FK job, FK skill, **`slot_index`** (small int ≥ 0) — rows sharing `(job_id, slot_index)` are **alternatives**; exactly **one** satisfies that slot |
-| **Course** | `id`, `title`, `url`, `provider` |
-| **CourseSkill** | FK course, FK skill — many-to-many |
-
-Constraint suggestion: `UNIQUE(job_id, slot_index, skill_id)`. Seed/import maps dataset **frameworks** column → multiple rows per slot.
-
-Optional later: `Skill.category`, `Job.region`.
+**Tests:** Pytest covers DSS modules (`similarity`, `ahp`, `topsis`, `setcover`, `pipeline` rules/integration) and `POST /api/analyze/` (`apps/analysis/tests.py`). Postman collection: `backend/postman/Career-Path-Analyzer-cosine-similarity.postman_collection.json`.
 
 ---
 
-## Part D — API contract (draft)
+## Repository layout (actual)
 
-**`GET /api/skills/`** → `[{ "id", "name" }]`
+```
+career-path-analyzer/
+  CAREER_PATH_ANALYZER_FULL_PLAN.md   ← this file
+  backend/
+    manage.py
+    requirements.txt
+    .env.example
+    config/                 # settings, urls
+    apps/
+      catalog/              # models, admin (empty), serializers, views, seed_catalog
+      analysis/             # analyze view, serializers, debug test endpoints
+      dss/                  # pure Python DSS
+        constants.py
+        types.py
+        similarity.py
+        ahp.py
+        topsis.py
+        setcover.py
+        pipeline.py
+        tests/
+    data/seed/              # CSV: jobs, skills taxonomy, courses
+    postman/
+  frontend/
+    src/
+      api/client.ts         # fetchSkills, analyze
+      context/AnalysisContext.tsx
+      pages/                # Skills, Priorities, Recommendations
+      components/
+      utils/mappers.ts
+```
 
-**`GET /api/jobs/`** → optional list/browse for admin or UI.
+---
 
-**`POST /api/analyze/`** — body example:
+## Processing pipeline (runtime — as implemented)
+
+Order in `apps/dss/pipeline.py`:
+
+1. **Vocabulary** — sorted union of skill IDs from jobs + user.
+2. **User vector** — declared skills mapped to weights (`beginner` 0.2, `under average` 0.4, `average` 0.6, `above average` 0.8, `advanced` 1.0).
+3. **Skill match** — cosine similarity: user vector vs job **relaxed binary** vector (1 on each mandatory skill and each skill in any framework alternative). See `similarity.py`.
+4. **Threshold** — drop jobs with `skill_match_score < threshold` (default `0.4`).
+5. **Learning effort** (per job) — count of missing mandatory skills + count of framework slots where `max(user weight in slot) = 0`.
+6. **Decision matrix** — columns: `skill_match`, `salary`, `demand`, `learning_effort`.
+7. **AHP** — six pairwise comparisons → weights + consistency ratio `CR` (warn if `CR > 0.1`). Frontend sends a **priority ranking**; backend converts to Saaty pairwises via `pairwise_from_priority_ranking` (adjacent ranks → 3, one apart → 5, two apart → 7).
+8. **TOPSIS** — column-wise **min–max** to [0,1] (benefit columns: higher better; `learning_effort`: cost, inverted); multiply by AHP weights; positive/negative ideal; Euclidean distances; closeness `C_i = D⁻/(D⁺+D⁻)`; rank descending.
+9. **Gaps** — `missing_skills` (mandatory not in user profile); `optional_frameworks` (unsatisfied OR slots with all alternatives listed).
+10. **Set Cover** — minimize selected courses covering union of missing skills (one representative skill per empty framework slot for cover set). Returns `learning_plan` with `selected_courses`, `covered_skills`, `uncovered_skills`.
+
+**Not used:** k-Means (`clustering.py` does not exist; Step 6 intentionally skipped).
+
+### Framework OR semantics
+
+| Concern | Behavior |
+|---------|----------|
+| **Similarity (cosine)** | Relaxed bag: job vector has 1 on every mandatory skill and every framework alternative skill (document in thesis if comparing to strict per-slot max). |
+| **Learning effort** | One unit per **unsatisfied slot** (not per alternative). |
+| **API output** | `optional_frameworks`: `[{ slot_index, alternatives: [{ skill_id, name }] }]` when slot unsatisfied. |
+| **Frontend** | Separate “Framework Choices — pick one” section per ranked job. |
+
+### Decision criteria
+
+Keys: `skill_match`, `salary`, `demand`, `learning_effort` — defined in `apps/dss/constants.py`.
+
+---
+
+## Database catalog
+
+| Model | Purpose |
+|-------|---------|
+| **Skill** | `name` (unique) |
+| **Job** | `title`, `description`, `avg_salary`, `demand_score` |
+| **JobSkill** | Mandatory skill (AND) |
+| **JobFrameworkAlternative** | OR slot: same `job_id` + `slot_index` = alternatives |
+| **Course** | `title`, `url`, `provider` |
+| **CourseSkill** | Course teaches skill |
+
+Seed: `python manage.py seed_catalog` (optional `--purge`). CSVs under `backend/data/seed/`.
+
+---
+
+## API contract (implemented)
+
+Base URL: `http://127.0.0.1:8000/api/` (dev). CORS enabled for frontend origin.
+
+### Catalog
+
+| Method | Path | Response |
+|--------|------|------------|
+| GET | `/skills/` | `[{ "id", "name" }]` |
+| GET | `/jobs/` | Jobs with skills/frameworks (list serializer) |
+| GET | `/courses/` | Courses with linked skills |
+
+### Analyze
+
+**`POST /api/analyze/`**
+
+Request (frontend shape):
 
 ```json
 {
   "skills": [
-    { "skill_id": 12, "level": "intermediate" },
-    { "skill_id": 15, "level": "advanced" }
+    { "name": "HTML", "level": "Average" },
+    { "name": "JavaScript", "level": "Advanced" }
   ],
-  "pairwise": [
-    { "a": "skill_match", "b": "salary", "value": 3 },
-    { "a": "skill_match", "b": "demand", "value": 5 },
-    { "a": "skill_match", "b": "learning_effort", "value": 7 },
-    { "a": "salary", "b": "demand", "value": 3 },
-    { "a": "salary", "b": "learning_effort", "value": 5 },
-    { "a": "demand", "b": "learning_effort", "value": 3 }
-  ],
-  "threshold": 0.4,
-  "n_clusters": 5
+  "priorities": ["demand", "learn", "match", "salary"],
+  "threshold": 0.4
 }
 ```
 
-Response includes at minimum: `weights`, `consistency_ratio`, `cluster`, `ranked_jobs` (each with `topsis_score`, `skill_match_score`, `learning_effort`, `missing_skills`, **`optional_frameworks`** — see below), `learning_plan` from Set Cover.
+- `priorities`: exactly **4 unique** ids, **most important first**: `match` → `skill_match`, `learn` → `learning_effort`, `salary`, `demand`.
+- Skill `name` matched case-insensitively to catalog; unknown names → `400`.
 
-**`optional_frameworks` (per ranked job)** — example shape:
+Response (summary):
 
 ```json
-"optional_frameworks": [
-  {
-    "slot_index": 0,
-    "alternatives": [
-      { "skill_id": 101, "name": "React" },
-      { "skill_id": 102, "name": "Vue" },
-      { "skill_id": 103, "name": "Angular" }
-    ]
-  }
-]
+{
+  "ahp": {
+    "weights": { "skill_match": 0.12, "salary": 0.06, "demand": 0.56, "learning_effort": 0.26 },
+    "lambda_max": 4.08,
+    "consistency_ratio": 0.05,
+    "consistency_ok": true
+  },
+  "ranked_jobs": [
+    {
+      "rank": 1,
+      "job_id": 1,
+      "title": "Frontend Developer",
+      "description": "...",
+      "topsis_score": 0.69,
+      "skill_match_score": 0.59,
+      "avg_salary": 13.5,
+      "demand_score": 47,
+      "learning_effort": 5,
+      "missing_skills": [{ "skill_id": 7, "name": "Responsive Design" }],
+      "optional_frameworks": []
+    }
+  ],
+  "learning_plan": {
+    "selected_courses": [{ "course_id": 1, "title": "...", "provider": "...", "url": "...", "skills": [...] }],
+    "covered_skills": [...],
+    "uncovered_skills": [...],
+    "solver_status": "Optimal"
+  },
+  "meta": { "vocab_size": 35, "jobs_evaluated": 20, "jobs_after_threshold": 4 }
+}
 ```
 
-Omitted or empty array when every framework slot has \(\max_{t\in\text{slot}} u_t > 0\).
+### Debug / test endpoints (dev)
 
-Align field names with the frontend when it is linked.
+Under `/api/test/`: `catalog-stats`, `cosine-example`, `similarity-preview`, `pipeline-preview` — see `apps/analysis/debug_views.py`.
 
 ---
 
-## Part E — Repository layout (target)
+## Frontend flow
 
+1. **Home** → **Skills** — live search against `GET /skills/`; add skills + levels from the catalog list.
+2. **Priorities** — drag/rank four criteria; **Analyze** calls `POST /analyze/`.
+3. **Recommendations** — top careers (TOPSIS), detail, mandatory gaps + courses, **framework choices**, **recommended learning plan** (Set Cover courses + skill chips).
+
+Env: `VITE_API_URL` (default `http://127.0.0.1:8000/api`).
+
+---
+
+## Libraries
+
+| Need | Library |
+|------|---------|
+| Vectors, cosine | NumPy |
+| AHP eigenpair | NumPy `linalg.eig` |
+| Set Cover | PuLP |
+| Web API | Django, DRF, django-cors-headers |
+| DB | psycopg (PostgreSQL) |
+| API schema (configured, not fully exposed) | drf-spectacular |
+| Tests | pytest, pytest-django |
+| Frontend HTTP | axios |
+
+---
+
+## How to run (development)
+
+**Backend**
+
+```bash
+cd backend
+python -m venv .venv
+# activate venv
+pip install -r requirements.txt
+# configure .env / DATABASE
+python manage.py migrate
+python manage.py seed_catalog
+python manage.py runserver
 ```
-career-path-analyzer-backend/
-  manage.py
-  requirements.txt
-  .env.example
-  README.md
-  config/
-    settings/base.py dev.py prod.py
-    urls.py wsgi.py asgi.py
-  apps/
-    catalog/          # models, admin, serializers, views, urls
-    analysis/       # serializers + analyze view only (no DB models)
-    dss/            # pure Python — NO Django imports
-      constants.py
-      similarity.py
-      clustering.py
-      ahp.py
-      topsis.py
-      setcover.py
-      pipeline.py
-      types.py
-      tests/
-  data/seed/        # skills.json, jobs.json, courses.json (or CSV ingestion)
+
+**Frontend**
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+**Tests**
+
+```bash
+cd backend
+pytest
 ```
 
 ---
 
-## Part F — Execution steps (for the agent)
+## Original execution steps (reference)
 
-Complete each step before asking for the next. After Step 1 succeeds, say **`Execute Step 2`**, and so on.
+The project was built following Steps 1–12 below. Use **`Execute Step N`** only for **remaining** work.
 
-### Step 1 — Project scaffold
+| Step | Title | Status |
+|------|--------|--------|
+| 1 | Project scaffold | Done |
+| 2 | Django apps and routing | Done |
+| 3 | Catalog models and migrations | Done |
+| 4 | Seed data | Done |
+| 5 | DSS similarity | Done (relaxed cosine; not per-slot max in cosine) |
+| 6 | k-Means clustering | **Skipped** |
+| 7 | AHP and TOPSIS | Done |
+| 8 | Set Cover and pipeline | Done |
+| 9 | REST catalog endpoints | Done |
+| 10 | REST analyze endpoint | Done |
+| 11 | Admin and OpenAPI | Partial — register models in admin; add `/api/schema/` to urls |
+| 12 | Polish | Partial — add project README, example curl, optional Spectacular UI |
 
-- Create Django project under `config/` (or equivalent single settings package).
-- Add `requirements.txt` with: Django≥5, djangorestframework, django-cors-headers, psycopg[binary], drf-spectacular, python-dotenv, numpy, scipy, scikit-learn, pulp, pytest, pytest-django, factory-boy.
-- Add `.env.example` (`DATABASE_URL` or discrete `DB_*`, `SECRET_KEY`, `DEBUG`).
-- Split settings `base.py` / `dev.py`; enable `REST_FRAMEWORK`, `CORS_ALLOWED_ORIGINS` placeholder.
-- **Done when:** `python manage.py check` passes and development server starts.
+### Remaining polish (suggested)
 
-### Step 2 — Django apps and routing
-
-- Create apps `catalog`, `analysis`; create package `apps/dss` (add `apps` to `PYTHONPATH` or install as editable — choose pattern used by team).
-- Wire root `urls.py` to include `/api/` routes (placeholder views OK).
-- **Done when:** project loads URLs without error.
-
-### Step 3 — Catalog models and migrations
-
-- Implement `Skill`, `Job`, `JobSkill`, **`JobFrameworkAlternative`**, `Course`, `CourseSkill` as specified in Part C.
-- Run migrations against PostgreSQL (or document SQLite only for local smoke — production target is Postgres).
-- **Done when:** `migrate` succeeds and models appear in Django shell.
-
-### Step 4 — Seed data
-
-- Add `management/commands/seed_catalog.py` loading `data/seed/*.json` (or CSV). Map **`frameworks`** column into **`JobFrameworkAlternative`**: frameworks listed together for one job → **one `slot_index`** (e.g. 0) with one row per framework skill; separate slots if multiple disjoint OR groups appear in schema later.
-- Ensure each framework string resolves to a `Skill`; mandatory skills → `JobSkill`.
-- **Done when:** seed runs idempotently enough for dev repeat (`flush` + seed or upsert logic).
-
-### Step 5 — DSS core: similarity (mandatory + framework slots)
-
-- Implement `constants.py`, `types.py`.
-- Implement `similarity.py`: vocabulary from mandatory + framework skills; **mandatory** match (cosine or equivalent segment); **framework slots** via \(\max\) per slot; single **`skill_match_score`** ∈ \([0,1]\); unit tests including **one job with OR slot** (user knows Vue only → slot satisfied; user knows none → optional_frameworks populated downstream).
-- **Done when:** pytest passes for similarity module.
-
-### Step 6 — DSS: clustering
-
-- Implement `clustering.py`: binary job rows — **1** on skill \(s\) if mandatory **or** \(s\) appears in any **`JobFrameworkAlternative`** for that job (relaxed representation for clustering).
-- Fit `KMeans` on that matrix; cache centroids keyed by catalog version/hash where practical; assign user vector in same skill space to nearest centroid.
-- Unit tests with fixed random seed.
-- **Done when:** pytest passes.
-
-### Step 7 — DSS: AHP and TOPSIS
-
-- Implement `ahp.py`: pairwise list → comparison matrix → eigenvector weights + \(CR\).
-- Implement `topsis.py`: benefit vs cost columns; min-max normalization input; weighted TOPSIS; return sorted indices + closeness scores.
-- Unit tests with small numerical fixtures.
-- **Done when:** pytest passes.
-
-### Step 8 — DSS: Set Cover and pipeline
-
-- Implement `setcover.py` with PuLP: binary \(x_c\), cover constraints per missing skill.
-- Implement `pipeline.py`: orchestrate similarity → threshold → clustering meta → matrix (**LearningEffort** uses mandatory gaps + unmatched framework slots) → AHP → TOPSIS → **`missing_skills`** + **`optional_frameworks`** → Set Cover per Part B rules.
-- Integration-style unit test on miniature catalog fixture.
-- **Done when:** pytest passes for pipeline.
-
-### Step 9 — REST: catalog endpoints
-
-- DRF serializers/viewsets or APIViews for `GET /api/skills/`, `GET /api/jobs/`.
-- Register routes under `catalog/urls.py`.
-- **Done when:** browsable API or curl returns JSON.
-
-### Step 10 — REST: analyze endpoint
-
-- Request/response serializers in `analysis/` matching Part D.
-- View loads catalog from DB into DTOs, calls `pipeline.run(...)`, returns JSON.
-- Handle validation errors (unknown skill IDs, inconsistent pairwise).
-- **Done when:** `POST /api/analyze/` returns coherent ranking + `learning_plan` on seeded DB.
-
-### Step 11 — Admin and documentation
-
-- Register catalog models in Django admin.
-- Add `drf-spectacular` — `/api/schema/` and Swagger UI.
-- **Done when:** admin usable and schema generates.
-
-### Step 12 — Polish
-
-- README: setup, env vars, migrate, seed, run server, example curl.
-- Optional: pytest integration hitting analyze API.
-- **Done when:** another developer can follow README end-to-end.
+- Register catalog models in `apps/catalog/admin.py`.
+- Wire `drf-spectacular` schema + Swagger in `config/urls.py`.
+- Add `backend/README.md` (and/or root README) with setup, seed, analyze example.
+- Align thesis text with: skipped k-Means, min–max TOPSIS, relaxed cosine vs strict OR-slot matching if needed.
 
 ---
 
-## Start here
+## Design notes for thesis / review
 
-Tell the agent:
-
-> **`Execute Step 1`** according to `@docs/CAREER_PATH_ANALYZER_FULL_PLAN.md`.
+1. **TOPSIS normalization:** Implementation uses **min–max** per column (not vector normalization \(r_{ij} = x_{ij}/\sqrt{\sum x_{ij}^2}\)). Suited to mixed scales, few alternatives, and explicit cost handling for `learning_effort`.
+2. **Priority → AHP:** User ranks four criteria; backend generates Saaty pairwises (gaps 0/1/2 → intensities 3/5/7).
+3. **Similarity vs gaps:** Cosine uses relaxed job encoding; gap detection and learning effort use strict slot/mandatory rules in `pipeline.py`.
 
 ---
 
-*Last updated: mandatory skills + framework OR slots (`JobFrameworkAlternative`); similarity uses max-per-slot; optional_frameworks in API; execution Steps 1–12.*
+*This document supersedes the original backend-only plan: it reflects the integrated React frontend, skipped clustering, actual API payloads, and current completion status.*

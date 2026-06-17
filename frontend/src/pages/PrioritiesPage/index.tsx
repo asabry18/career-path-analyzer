@@ -1,12 +1,55 @@
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PageLayout from "../../components/PageLayout";
 import BackButton from "../../components/BackButton";
 import PageHeader from "../../components/PageHeader";
 import PrimaryButton from "../../components/PrimaryButton";
 import PriorityCard from "../../components/PriorityCard";
-import { useAnalysis } from "../../context/AnalysisContext";
+import { useAnalysis } from "../../context/useAnalysis";
+import type { Priority } from "../../types";
 import "./PrioritiesPage.css";
+
+const SAATY_GAP_TO_INTENSITY = [3, 5, 7];
+
+function computePriorityWeights(priorities: Priority[]): Record<string, number> {
+  const n = priorities.length;
+  if (n === 0) return {};
+
+  const matrix: number[][] = Array.from({ length: n }, () =>
+    Array(n).fill(1)
+  );
+
+  for (let i = 0; i < n; i += 1) {
+    for (let j = i + 1; j < n; j += 1) {
+      const gap = j - i - 1;
+      const intensity =
+        SAATY_GAP_TO_INTENSITY[gap] ?? (7 + 2 * (gap - 2));
+      matrix[i][j] = intensity;
+      matrix[j][i] = 1 / intensity;
+    }
+  }
+
+  let weights = Array(n).fill(1 / n);
+  for (let iter = 0; iter < 30; iter += 1) {
+    const next = Array(n).fill(0);
+    for (let i = 0; i < n; i += 1) {
+      let sum = 0;
+      for (let j = 0; j < n; j += 1) {
+        sum += matrix[i][j] * weights[j];
+      }
+      next[i] = sum;
+    }
+    const total = next.reduce((acc, v) => acc + v, 0);
+    if (total > 0) {
+      weights = next.map((v) => v / total);
+    }
+  }
+
+  return priorities.reduce<Record<string, number>>((acc, p, idx) => {
+    acc[p.id] = weights[idx] ?? 0;
+    return acc;
+  }, {});
+}
 
 export default function PrioritiesPage() {
   const navigate = useNavigate();
@@ -16,6 +59,10 @@ export default function PrioritiesPage() {
   const dragItem = useRef<number | null>(null);
   const dragOverItem = useRef<number | null>(null);
   const [draggingIdx, setDraggingIdx] = useState<number | null>(null);
+  const weights = useMemo(
+    () => computePriorityWeights(priorities),
+    [priorities]
+  );
 
   function swap(a: number, b: number) {
     setPriorities(
@@ -49,8 +96,10 @@ export default function PrioritiesPage() {
   }
 
   async function handleAnalyze() {
-    await runAnalysis();
-    navigate("/recommendations");
+    const ok = await runAnalysis();
+    if (ok) {
+      navigate("/recommendations");
+    }
   }
 
   return (
@@ -83,6 +132,7 @@ export default function PrioritiesPage() {
             index={i}
             total={priorities.length}
             isDragging={draggingIdx === i}
+            weight={weights[p.id] ?? 0}
             onMoveUp={() => i > 0 && swap(i, i - 1)}
             onMoveDown={() => i < priorities.length - 1 && swap(i, i + 1)}
             onDragStart={() => handleDragStart(i)}

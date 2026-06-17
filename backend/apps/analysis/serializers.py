@@ -44,7 +44,7 @@ class AnalyzeRequestSerializer(serializers.Serializer):
         max_length=4,
         help_text="Ordered list of priority ids from most to least important.",
     )
-    threshold = serializers.FloatField(default=0.4, min_value=0.0, max_value=1.0)
+    threshold = serializers.FloatField(default=0.3, min_value=0.0, max_value=1.0)
 
     def validate_priorities(self, value):
         if len(set(value)) != 4:

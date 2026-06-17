@@ -1,23 +1,15 @@
-export interface Career {
-  id: number;
-  title: string;
-  salary: number;
-  growth: number;
-  openings: number;
-}
-
 export interface Stats {
-  openingPositions: string;
-  averageSalary: string;
-  growthRate: string;
+  jobCount: string;
+  medianSalary: string;
+  salaryIqr: string;
 }
 
-export interface CareerData {
-  topCareers: Career[];
-  stats: Stats;
-}
-
-export type SkillLevel = "Beginner" | "Intermediate" | "Advanced";
+export type SkillLevel =
+  | "Beginner"
+  | "Under Average"
+  | "Average"
+  | "Above Average"
+  | "Advanced";
 
 export interface Skill {
   name: string;
@@ -131,4 +123,110 @@ export interface AnalyzeRequest {
   skills: { name: string; level: SkillLevel }[];
   priorities: string[];
   threshold: number;
+}
+
+// ── Auth types ─────────────────────────────────────────────────────
+
+export interface AuthUser {
+  first_name: string;
+  last_name: string;
+  email: string;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface SignupRequest {
+  first_name: string;
+  last_name: string;
+  email: string;
+  password: string;
+}
+
+export interface AuthTokens {
+  access: string;
+  refresh: string;
+}
+
+export interface SignupResponse extends AuthTokens {
+  user: AuthUser;
+}
+
+// ── Insights types ────────────────────────────────────────────────
+
+export interface InsightsJob {
+  id: number;
+  title: string;
+  demand_score: number;
+  avg_salary: number;
+  sector?: string | null;
+  skill_count?: number;
+  salary_band?: string | null;
+  key_skills?: string[];
+}
+
+export interface InsightsSkill {
+  id: number;
+  name: string;
+  frequency: number;
+}
+
+export interface InsightsHighLeverageSkill {
+  id: number;
+  name: string;
+  job_count: number;
+  course_count: number;
+}
+
+export interface InsightsPrioritySpotlights {
+  salary: InsightsJob[];
+  demand: InsightsJob[];
+  easy_entry: InsightsJob[];
+  balance: InsightsJob[];
+}
+
+export interface InsightsEntryRolesBySector {
+  sector: string;
+  roles: InsightsJob[];
+}
+
+export interface InsightsCourse {
+  id: number;
+  title: string;
+  provider: string;
+  skill_count: number;
+}
+
+export interface InsightsProvider {
+  provider: string;
+  count: number;
+}
+
+export interface InsightsSector {
+  name: string;
+  job_count: number;
+  total_demand: number;
+  avg_salary: number;
+  top_job: InsightsJob | null;
+}
+
+export interface InsightsResponse {
+  job_count: number;
+  median_salary: number;
+  salary_iqr: number;
+  top_demanded_jobs: InsightsJob[];
+  top_salary_jobs: InsightsJob[];
+  top_skills: InsightsSkill[];
+  sectors: InsightsSector[];
+  priority_spotlights: InsightsPrioritySpotlights;
+  entry_roles_by_sector: InsightsEntryRolesBySector[];
+  high_leverage_skills: InsightsHighLeverageSkill[];
+  demand_salary_jobs: InsightsJob[];
+  courses: {
+    total_courses: number;
+    top_courses: InsightsCourse[];
+    top_providers: InsightsProvider[];
+  };
 }
