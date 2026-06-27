@@ -38,23 +38,52 @@ interface PrioritySpotlightsProps {
   spotlights: InsightsPrioritySpotlights;
 }
 
-function JobRow({ job }: { job: InsightsJob }) {
+function JobRow({
+  job,
+  variant,
+}: {
+  job: InsightsJob;
+  variant: keyof InsightsPrioritySpotlights;
+}) {
+  const renderMetric = () => {
+    switch (variant) {
+      case "salary":
+        return (
+          <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1 text-xs text-gray-500 dark:text-gray-400">
+            <span>{job.avg_salary.toFixed(1)}K avg</span>
+            {job.salary_band && <span>{job.salary_band}</span>}
+          </div>
+        );
+      case "demand":
+        return (
+          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            {job.demand_score} demand
+          </p>
+        );
+      case "easy_entry":
+        return (
+          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            {job.skill_count ?? "—"} skills required
+          </p>
+        );
+      case "balance":
+        return (
+          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            {job.avg_salary.toFixed(1)}K avg · {job.demand_score} demand ·{" "}
+            {job.skill_count ?? "—"} skills
+          </p>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <li className="rounded-lg bg-gray-50 dark:bg-gray-800/60 px-3 py-2.5">
       <p className="text-sm font-medium text-gray-900 dark:text-white capitalize">
         {job.title}
       </p>
-      <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1 text-xs text-gray-500 dark:text-gray-400">
-        <span>{job.avg_salary.toFixed(1)}K avg</span>
-        <span>{job.demand_score} demand</span>
-        {job.skill_count != null && <span>{job.skill_count} skills</span>}
-        {job.salary_band && <span>{job.salary_band}</span>}
-      </div>
-      {job.key_skills && job.key_skills.length > 0 && (
-        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 truncate">
-          Key: {job.key_skills.join(", ")}
-        </p>
-      )}
+      {renderMetric()}
     </li>
   );
 }
@@ -107,7 +136,7 @@ export default function PrioritySpotlights({ spotlights }: PrioritySpotlightsPro
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{description}</p>
               <ul className="space-y-2">
                 {jobs.map((job) => (
-                  <JobRow key={job.id} job={job} />
+                  <JobRow key={job.id} job={job} variant={key} />
                 ))}
               </ul>
             </article>

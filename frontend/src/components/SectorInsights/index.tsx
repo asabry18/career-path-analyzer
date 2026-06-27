@@ -2,27 +2,22 @@ import { Briefcase, TrendingUp, DollarSign } from "lucide-react";
 import type { InsightsEntryRolesBySector, InsightsSector } from "../../types";
 
 const SECTOR_DESCRIPTIONS: Record<string, string> = {
-  Software: "Build applications, websites, and enterprise systems.",
+  Software: "Build applications, design user experiences, and grow product-focused careers.",
   Network: "Maintain infrastructure, security, and IT operations.",
   Data: "Analyze, engineer, and model data for business insights.",
-  Business: "Lead projects, drive sales, and grow organizations.",
-  Design: "Craft user experiences and visual product interfaces.",
 };
 
 const SECTOR_CHOOSE_IF: Record<string, string> = {
-  Software: "Choose this if you enjoy building products and writing code daily.",
+  Software:
+    "Choose this if you enjoy building products, designing interfaces, or working in tech-enabled roles.",
   Network: "Choose this if you prefer systems, troubleshooting, and infrastructure.",
   Data: "Choose this if you like working with numbers, patterns, and insights.",
-  Business: "Choose this if you want leadership, sales, or project coordination roles.",
-  Design: "Choose this if you care about how users experience digital products.",
 };
 
 const SECTOR_COLORS: Record<string, string> = {
   Software: "bg-blue-500",
   Network: "bg-emerald-500",
   Data: "bg-violet-500",
-  Business: "bg-amber-500",
-  Design: "bg-pink-500",
 };
 
 interface SectorInsightsProps {
@@ -128,11 +123,9 @@ export default function SectorInsights({ sectors, entryRolesBySector }: SectorIn
                         <span className="font-medium text-gray-700 dark:text-gray-300 capitalize">
                           {role.title}
                         </span>
-                        {" · "}
-                        {role.skill_count} skills · {role.demand_score} demand
                         {role.key_skills && role.key_skills.length > 0 && (
-                          <span className="block mt-0.5 truncate">
-                            Start with: {role.key_skills.join(", ")}
+                          <span className="block mt-0.5">
+                            {role.key_skills.join(", ")}
                           </span>
                         )}
                       </li>

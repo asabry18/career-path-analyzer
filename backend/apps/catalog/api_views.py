@@ -72,6 +72,17 @@ def _split_sectors(sector: str | None) -> list[str]:
     return [part.strip() for part in sector.split(",") if part.strip()]
 
 
+_MERGED_SECTORS = {"Business": "Software", "Design": "Software"}
+
+
+def _normalize_insight_sector(sector: str) -> str:
+    return _MERGED_SECTORS.get(sector, sector)
+
+
+def _insight_sectors_for_job(sector: str | None) -> set[str]:
+    return {_normalize_insight_sector(name) for name in _split_sectors(sector)}
+
+
 _SPOTLIGHT_LIMIT = 3
 _KEY_SKILLS_LIMIT = 4
 _HIGH_LEVERAGE_LIMIT = 10
@@ -155,7 +166,7 @@ def _build_entry_roles_by_sector(
 ) -> list[dict]:
     by_sector: dict[str, list[dict]] = defaultdict(list)
     for snap in snapshots:
-        for sector in _split_sectors(snap.get("sector")):
+        for sector in _insight_sectors_for_job(snap.get("sector")):
             by_sector[sector].append(snap)
 
     result: list[dict] = []
@@ -205,7 +216,7 @@ def _build_sector_insights(jobs: list[Job]) -> list[dict]:
     )
 
     for job in jobs:
-        sectors = _split_sectors(job.sector)
+        sectors = _insight_sectors_for_job(job.sector)
         if not sectors:
             continue
         for name in sectors:
