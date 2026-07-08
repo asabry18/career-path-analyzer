@@ -1,33 +1,32 @@
-ï»¿skill;course_name;link;platform
+skill;course_name;link;platform
 python;Introduction to Python Programming;https://www.udacity.com//course/introduction-to-python--ud1110;Udacity
 java;Introduction to Java Programming for Online Learners;https://www.udemy.com/learning-to-program-in-java-a-supplement-for-online-academic-learners/;Udemy
-c#;Create Power-Ups and Obstacles with C# in Unity;https://www.coursera.org/learn/create-power-ups-obstacles-c-sharp-unity;Coursera
-rest apis;Node:js : Building Rest Apis with Sails.js;https://www.udemy.com/building-rest-apis-with-sailsjs-and-nodejs/;Udemy
-database;Introduction to Database Queries;https://www.edx.org/course/introduction-to-database-queries;edX
-sql;Introduction to Relational Database and SQL;https://www.coursera.org/learn/introduction-to-relational-database-and-sql;Coursera
-docker;Introduction to Docker : The Basics;https://www.coursera.org/learn/docker-fundamentals;Coursera
+c#;C# masterclass;udemy.com/course/complete-csharp-masterclass/;Udemy
+rest apis;APIs;https://www.coursera.org/learn/apis;Coursera
+database;Introduction to Database Queries;https://maharatech.gov.eg/course/view.php?id=740;mahara tech
+sql; Relational Database and SQL;https://www.udemy.com/course/complete-microsoft-sql-masterclass-beginner-advanced/?couponCode=CP260518ALMXLD;Udemy
+docker;Introduction to Docker : The Basics;https://www.udemy.com/course/learn-docker/?couponCode=CP260518ALMXLD;Udemy
 git;Intro to Git;https://www.udemy.com/intro-to-git/;Udemy
-aws;AWS Fundamentals: Going Cloud-Native;https://www.coursera.org/learn/aws-fundamentals-going-cloud-native;Coursera
+aws;AWS Fundamentals;https://www.coursera.org/specializations/aws-fundamentals;Coursera
 microservices;Building Scalable Java Microservices with Spring Boot and Spring Cloud;https://www.coursera.org/learn/google-cloud-java-spring;Coursera
 security;Introduction to Cybersecurity for Business;https://www.coursera.org/learn/intro-cyber-security-business;Coursera
-html;HTML : Beginner Guide to HTML writing;https://www.udemy.com/html-beginner-guide/;Udemy
-css;HTML5 and CSS3 for beginners: Create a Website from Scratch;https://www.udemy.com/html5-and-css3-for-beginners-create-a-website-from-scratch/;Udemy
+html;The Complete Guide to HTML;https://www.udemy.com/course/the-complete-guide-to-html/?couponCode=CP260518ALMXLD;Udemy
+css;CSS - The Complete Guide;https://www.udemy.com/course/css-the-complete-guide-incl-flexbox-grid-sass/;Udemy
 javascript;JavaScript Basics Web Development Building Blocks;https://www.udemy.com/javascript-basics-web-development-building-blocks/;Udemy
-nosql;CRUD Operations using MongoDB NoSQL;https://www.coursera.org/learn/crud-operations-using-mongodb-nosql;Coursera
-restful apis;Understanding APIs and RESTful APIs Crash Course;https://www.udemy.com/course/learn-and-understand-apis-and-restful-apis/;Udemy
-unit testing;Introduction to Unit Testing in Jest - The Fundamentals;https://www.coursera.org/learn/unit-testing-in-jest;Coursera
+nosql;NoSQL Databases For Beginners;udemy.com/course/nosql-databases-for-beginners/;Udemy
+unit testing;JavaScript Unit Testing - The Practical Guide;https://www.udemy.com/course/javascript-unit-testing-the-practical-guide/;Udemy
 windows;The Complete Windows 10 Course. Beginner and Beyond;https://www.udemy.com/course/windows-10-computer-course/?utm_campaign=BG-Search_DSA_Beta_Prof_la.EN_cc.ROW-English&utm_source=bing&utm_medium=paid-search&portfolio=Bing-ROW-English&utm_audience=mx&utm_tactic=nb&utm_term=Career+Development&utm_content=o&funnel=&test=&msclkid=ab0ea1373bcc18cb068dc875cb12b90e&couponCode=CM251217G2;Udemy
 linux;Introduction to Linux;https://www.edx.org/course/introduction-to-linux;edX
 networking;Introduction to Open Source Networking Technologies;https://www.edx.org/course/introduction-to-open-source-networking-technologie;edX
 customer support;Create Customer Support Data with Google Sheets;https://www.coursera.org/learn/create-customer-support-data-with-google-sheets;Coursera
-customer service;Creating a Customer Service Survey Using Google Forms;https://www.coursera.org/learn/create-customer-service-survey-google-forms;Coursera
+customer service;Creating a Customer Service Survey Using Google Forms;https://www.coursera.org/learn/branding-and-cx;Coursera
 bootstrap;PSD to Bootstrap 3 for Beginners using HTML & CSS;https://www.udemy.com/psd-to-bootstrap/;Udemy
-c++;Introduction to Pointers and Memory Management in C/C++;https://www.coursera.org/learn/introduction-to-pointers-and-memory-in-c-and-cpp;Coursera
+c++;Introduction to Pointers and Memory Management in C/C++;https://www.coursera.org/specializations/coding-for-everyone;Coursera
 data structures;Data Structures and Performance;https://www.coursera.org/learn/data-structures-optimizing-performance;Coursera
-algorithms;Advanced Trading Algorithms;https://www.coursera.org/learn/Advanced-trading-algorithms;Coursera
-cloud;Introduction to Cloud Development with HTML5, CSS3, and JavaScript;https://www.edx.org/course/introduction-to-cloud-development-with-html5-css3-and-javascript;edX
+algorithms;Advanced Trading Algorithms;https://www.coursera.org/learn/algorithms-part1;Coursera
+cloud;Introduction to Cloud computing ;https://www.udemy.com/course/introduction-to-cloud-computing-on-amazon-aws-for-beginners/;Udemy
 design patterns;Software Design and Architecture Specialization;https://www.coursera.org/specializations/software-design-architecture;Coursera
-network security;Check Point Jump Start: Network Security;https://www.coursera.org/learn/check-point-jump-start-network-security;Coursera
+network security;Network Security;https://www.coursera.org/specializations/google-network-security;Coursera
 bash;Introduction to Bash Shell Scripting;https://www.coursera.org/learn/introduction-to-bash-shell-scripting;Coursera
 cloud security;AWS: Getting Started with Cloud Security;https://www.edx.org/course/aws-getting-started-with-cloud-security;edX
 sales;Fundamentals of Sales and Marketing, with Goldman Sachs 10,000 Women;https://www.coursera.org/learn/10k-women-6;Coursera
@@ -39,14 +38,14 @@ business analysis;Introduction to Business Analysis Using Spreadsheets: Basics;h
 it strategy;Customer-Centric IT Strategy;https://www.coursera.org/learn/uva-darden-customer-centric-it-strategy;Coursera
 project management;Introduction to Project Management;https://www.edx.org/course/introduction-to-project-management;edX
 budgeting;Basics of Finance and Budgeting;https://www.udemy.com/basics-of-finance-and-budgeting/;Udemy
-firebase;Build a Google Firebase Web Application;https://www.coursera.org/learn/build-a-google-firebase-webapp;Coursera
+firebase;learn firebase;https://www.coursera.org/learn/learn-firebase;Coursera
 xml;XML For Absolute Beginners: Learn to create your own tags;https://www.udemy.com/xml-for-absolute-beginners-learn-to-create-your-own-tags/;Udemy
 selenium;Advanced TestNG Framework and Integration with Selenium;https://www.coursera.org/learn/Advanced-testng-framework-integration-with-selenium;Coursera
 jira;Agile with Atlassian Jira;https://www.coursera.org/learn/agile-atlassian-jira;Coursera
-api testing;Introduction to API Testing using JMeter Tool;https://www.coursera.org/learn/introduction-to-api-testing-using-jmeter-tool;Coursera
-postman;Postman - Intro to APIs (without coding);https://www.coursera.org/learn/laura-gemmell-intro-postman-apis;Coursera
-etl;Introduction to Agent-based Modeling with NetLogo;https://www.coursera.org/learn/abm-netlogo;Coursera
-spark;Explore stock prices with Spark SQL;https://www.coursera.org/learn/data-exploration-spark-sql;Coursera
+api testing;Apply API Testing & Automation with Postman Specialization;https://www.coursera.org/specializations/postman-api-testing-automation-specialization;Coursera
+postman;Postman - Intro to APIs (without coding);https://www.udemy.com/course/introduction-to-postman-a-beginners-guide/?srsltid=AfmBOopab5L8_4VyN2gatsaTPVyaThGYI-WW9wL8eUPoTWYReDOsRA8Q;Udemy
+etl;ETL Developer - (MySQL, Data Migration ,MS SQL Server, SSIS);https://www.udemy.com/course/etl-developer-mysql-data-migration-ms-sql-server-ssis/?utm_campaign=Search_DSA_Beta_Prof_la.EN_cc.ROW-English_Subs&utm_source=google&utm_medium=paid-search&portfolio=ROW-English&utm_audience=mx&utm_tactic=nb&utm_term=_._ag_185568238764_._ad_769543047744_._kw_&utm_content=g&funnel=&test=&gad_source=1&gad_campaignid=22894903173&gbraid=0AAAAADROdO31FNKf6MoF1RNG9Z0FYcbgX&gclid=CjwKCAjwt7XQBhBkEiwAtStpp4TAz3pKY4ImNpoU6NXZKoD4wIp4src9yo3o6iruYiDjPc-N9CiBlBoCSfAQAvD_BwE&couponCode=CP260518ALMXLD;Udemy
+spark;Spark and Python for Big Data with PySpark Specialization;https://www.coursera.org/specializations/spark-python-big-data-analysis-pyspark;Coursera
 big data;Big Data Integration and Processing;https://www.coursera.org/learn/big-data-integration-processing;Coursera
 kubernetes;Fundamentals of Kubernetes Deployment;https://www.coursera.org/learn/kubernetes-deployment;Coursera
 jenkins;Introduction to Jenkins;https://www.edx.org/course/introduction-to-jenkins;edX
@@ -54,51 +53,51 @@ terraform;Terraform: The Complete Guide from Beginner to Expert;https://www.udem
 kotlin;Kotlin for Java Developers;https://www.coursera.org/learn/kotlin-for-java-developers;Coursera
 machine learning;Introduction to Machine Learning;https://www.coursera.org/learn/machine-learning-duke;Coursera
 deep learning;Introduction to Deep Learning & Neural Networks with Keras;https://www.coursera.org/learn/introduction-to-deep-learning-with-keras;Coursera
-statistics;1 - Concepts of Statistics For Beginners Step by Step;https://www.udemy.com/concepts-of-statistics/;Udemy
-pandas;Intermediate Pandas Python Library for Data Science;https://www.coursera.org/learn/intermediate-pandas-python-library-data-science;Coursera
-numpy;Logistic Regression with Python and Numpy;https://www.coursera.org/learn/deep-learning-fundamentals-logistic-regression;Coursera
-azure;Build Random Forests in R with Azure ML Studio;https://www.coursera.org/learn/azure-machine-learning-studio-random-forests;Coursera
+statistics;1 - Concepts of Statistics For Beginners Step by Step;https://www.coursera.org/learn/stanford-statistics;Coursera
+pandas;Pandas for Data Science;https://www.coursera.org/learn/pandas-data-science;Coursera
+numpy;Logistic Regression with Python and Numpy;https://www.coursera.org/learn/packt-intro-to-numpy-ftdg2;Coursera
+azure;Build Random Forests in R with Azure ML Studio;https://www.coursera.org/learn/microsoft-azure-cloud-services;Coursera
 gcp;Introduction to Trading, Machine Learning & GCP;https://www.coursera.org/learn/introduction-trading-machine-learning-gcp;Coursera
 cloud networking;Cloud Networking;https://www.coursera.org/learn/cloud-networking;Coursera
-switching;Packet Switching Networks and Algorithms;https://www.coursera.org/projects/creating-routing-policies-handle-traffic-aws-route53;scrum
+switching;Packet Switching Networks and Algorithms;https://www.coursera.org/projects/creating-routing-policies-handle-traffic-aws-route53;Coursera
 tcp/ip;Introduction to TCP/IP;https://www.coursera.org/learn/tcpip;Coursera
 project planning;Fundamentals of Project Planning and Management;https://www.coursera.org/learn/uva-darden-project-management;Coursera
-agile;Agile Mindset Introduction;https://www.edx.org/course/agile-mindset-introduction;edX
+agile;Agile Mindset Introduction;udemy.com/course/agile-project-management-agilepm-certification-masterclass/?couponCode=PMNVD1525&utm_campaign=Search_Keyword_Gamma_NonP_la.ES_cc.ROW-Spanish&utm_source=google&utm_medium=paid-search&portfolio=ROW-Spanish&utm_audience=mx&utm_tactic=nb&utm_term=_._ag_167955707751_._ad_762942537566_._kw_cursos%20en%20línea&utm_content=g&funnel=&test=&gad_source=1&gad_campaignid=21487757256&gbraid=0AAAAADROdO0N2XMFH4ZhESTPWBI03MZz3&gclid=Cj0KCQjwlLDQBhDjARIsAPlIefGK6_7JPAQ7y-JkiI677ECeHkyZ1yVMvCx9y4YmpIKDsuUU_H9xEDgaAs5PEALw_wcB;udemy
 scrum;Scrum Master Certification Specialization;https://www.coursera.org/specializations/learnquest-certified-scrum-master;Coursera
-risk management;Portfolio and Risk Management;https://www.coursera.org/learn/portfolio-management;Coursera
-leadership;Fundamentals of Leadership, with Goldman Sachs 10,000 Women;https://www.coursera.org/learn/10k-women-3;Coursera
-xcode;Develop 6 Beginner iPhone Games with Swift and Xcode;https://www.udemy.com/course/develop-6-beginner-iphone-games-with-swift-and-xcode/;Udacity
+risk management;Portfolio and Risk Management;https://www.coursera.org/learn/introduction-to-risk-management;Coursera
+leadership;Fundamentals of Leadership, with Goldman Sachs 10,000 Women;https://www.udemy.com/course/leadershipmasterclass/;Udemy
+xcode;Develop 6 Beginner iPhone Games with Swift and Xcode;https://www.udemy.com/course/develop-6-beginner-iphone-games-with-swift-and-xcode/;Udemy
 uikit;UIKit Fundamentals;https://www.udacity.com//course/uikit-fundamentals--ud788;Udacity
 swift;Swift for Beginners;https://www.udacity.com//course/swift-for-Beginners--ud1022;Udacity
-wordpress;Simple And Easy: Wordpress For Beginners;https://www.udemy.com/simple-and-easy-wordpress-101/;Udemy
-plugins;Wordpress Essentials: Useful Plugins;https://www.udemy.com/wordpress-essentials-useful-plugins/;Udemy
-themes;Instant Harmonica - play two Star Wars themes in 30 minutes ;https://www.udemy.com/instant-harmonica-play-two-star-wars-themes-in-30-minutes/;Udemy
+wordpress;WordPress 2026: The Complete WordPress Website Course;https://www.udemy.com/course/complete-wp-course/;Udemy
+plugins;Creating WordPress Plugins The Right Way;https://www.udemy.com/course/wordpress-plugin-development/;Udemy
+themes;WordPress Theme Development from Scratch 2.0;https://www.udemy.com/course/advanced-wordpress-theme-development-with-bootstrap/;Udemy
 mysql;Build CRUD Application - PHP & Mysql;https://www.udemy.com/build-crud-application-php-mysql/;Udemy
 django;Django For Beginners;https://www.udemy.com/django-for-beginners/;Udemy
 flask;Professional Python Web Development Using Flask;https://www.udemy.com/python-flask-course/;Udemy
-nlp;Deep Learning NLP: Training GPT-2 from scratch;https://www.coursera.org/learn/deep-learning-nlp-gpt-2;Coursera
-rpa;RPA Lifecycle: Introduction, Discovery and Design;https://www.coursera.org/learn/rpa-introduction;Coursera
-uipath;RPA Developer with UiPath;https://www.udacity.com//course/rpa-developer-nanodegree--nd340;Udacity
+nlp;Deep Learning NLP: Training GPT-2 from scratch;https://www.coursera.org/specializations/natural-language-processing;Coursera
+rpa;RPA Lifecycle: Introduction, Discovery and Design;https://www.coursera.org/specializations/roboticprocessautomation;Coursera
+uipath;RPA Developer with UiPath;https://www.coursera.org/learn/automation-techniques-in-rpa;Coursera
 spring boot;Spring Boot Tutorial For Beginners;https://www.udemy.com/spring-boot-tutorial-for-beginners/;Udemy
 gradle;Gradle Fundamentals;https://www.udemy.com/course/gradle-fundamentals/;Udemy
-figma;Build an E-commerce Dashboard with Figma;https://www.coursera.org/learn/e-commerce-dashboard-figma;Coursera
-adobe xd;CÃƒÂ³mo crear maquetas con Adobe XD;https://www.udemy.com/como-crear-maquetas-con-adobe-xd/;Udemy
-prototyping;Customer Journey Prototyping in XD;https://www.coursera.org/learn/customer-journey-prototyping-in-xd;Coursera
+figma;Figma UI / UX Design Essentials Specialization;https://www.coursera.org/specializations/beginnerfigmauiuxdesignessentials;Coursera
+adobe xd;User Experience Design Essentials - Adobe XD UI UX Design;https://www.udemy.com/course/ui-ux-web-design-using-adobe-xd;Udemy
+prototyping;Figma Prototyping: A deep dive for UX/UI Designer;https://www.udemy.com/course/figma-prototyping-a-deep-dive-for-ux-ui-designer;Coursera
 user research;Using Google Forms to Analyze User Research Data;https://www.coursera.org/learn/analyzing-user-data-in-google-forms;Coursera
-.net;Introduction to Agent-based Modeling with NetLogo;https://www.coursera.org/learn/abm-netlogo;Coursera
+.net;Learning Visual Basic .NET - A Guide To VB.NET Programming;https://www.udemy.com/course/learning-visual-basic-net;Coursera
 workflows;Modern Web Development with SASS, Gulp, NPM & Web Workflows;https://www.udemy.com/modern-web-development-with-sass-gulp-npm-web-workflows/;Udemy
-unity;Make Your Pick-Ups Look Cool in Unity (Intro to Animation 1);https://www.coursera.org/learn/make-pick-ups-look-cool-unity-introduction-animation-1;Coursera
-animation;Make Your Pick-Ups Look Cool in Unity (Intro to Animation 1);https://www.coursera.org/learn/make-pick-ups-look-cool-unity-introduction-animation-1;Coursera
+unity;Complete C# Unity 3D Game Development in Unity 6;https://www.udemy.com/course/unitycourse2/;Coursera
+animation;3D Animation using Unity Timeline;https://www.udemy.com/course/3d-animation-using-unity-timeline;Coursera
 sprint planning;Sprint Planning for Faster Agile Team Delivery;https://www.coursera.org/learn/sprint-planning-for-faster-agile-team-delivery;Coursera
 data modeling;Data Modelling Essentials;https://www.coursera.org/learn/packt-9781835462980-yyp25-p3;Coursera
-drupal;Drupal Views: Introduction to Enhancing Your Drupal Website;https://www.udemy.com/drupalviews/;Udemy
-internal control;Internal Controls - Design, Implementation and Monitoring;https://www.udemy.com/internal-controls/;Udemy
-reporting;Financial Reporting - Fundamentals/Basics;https://www.udemy.com/financial-reporting-fundamentals/;Udemy
-compliance;Examine 508 Compliance & Accessibility in Chrome Extensions;https://www.coursera.org/learn/examine-508-compliance-and-accessibility-chrome-extensions;Coursera
+drupal;Complete Drupal 11 Development Course – For beginners 2026;https://www.udemy.com/course/complete-drupal-11-development-course-for-beginners-2026;Udemy
+internal control;Internal Controls - Design, Implementation and Monitoring;https://www.udemy.com/course/internal-controls/;Udemy
+reporting;Financial Reporting & Analysis: Complete Preparation;https://www.udemy.com/course/financial-reporting-analysis/;Udemy
+compliance;Regulatory Compliance Specialization;https://www.coursera.org/specializations/regulatory-compliance;Coursera
 opencv;Introduction to Computer Vision with Watson and OpenCV;https://www.coursera.org/learn/introduction-computer-vision-watson-opencv;Coursera
-image processing;Image Processing with Python;https://www.coursera.org/learn/image-processing-with-python;Coursera
+image processing;Image Processing with Python;https://www.udemy.com/course/complete-python-based-image-processing-and-computer-vision;Coursera
 node.js;Introduction to Node.js for Beginners;https://www.udemy.com/introduction-to-nodejs-for-beginners/;Udemy
-react;Introduction to Front-end Development with ReactJS;https://www.coursera.org/learn/into-to-reactjs;Coursera
+react;Introduction to Front-end Development with ReactJS;https://www.udemy.com/course/react-the-complete-guide-incl-redux;Coursera
 vue;VueJS V1 Introduction to VueJS JavaScript Framework;https://www.udemy.com/vuejs-introduction-to-vuejs-javascript-framework/;Udemy
 angular;Angular 2 & TypeScript Beginner Web Development;https://www.udemy.com/angular2/;Udemy
 stored procedures;Stored Procedures Unpacked - Code in TSQL;https://www.udemy.com/course/stored-procedures-unpacked-learn-to-code-t-sql-stored-procs/?couponCode=CM251217G2;Udemy
@@ -124,7 +123,7 @@ ui/ux basics;Introduction to UX/UI Design;https://www.coursera.org/learn/introdu
 team leadership;Leading Teams;https://www.coursera.org/learn/leading-teams;Coursera
 fastapi;FastAPI - The Complete Course 2026 (Beginner + Advanced);https://www.udemy.com/course/fastapi-the-complete-course/?couponCode=CM251217G2;Udemy
 fiori;SAP FIORI - Configuring Fiori Environment and Security;https://www.udemy.com/course/sap-fiori-setup-and-security/;Udemy
-responsive design;Responsive Web Design;https://www.coursera.org/learn/responsive-web-design;Coursera
+responsive design;Responsive Web Design;https://www.udemy.com/course/design-and-develop-a-killer-website-with-html5-and-css3/?utm_campaign=Search_DSA_Beta_Prof_la.EN_cc.ROW-English_Subs&utm_source=google&utm_medium=paid-search&portfolio=ROW-English&utm_audience=mx&utm_tactic=nb&utm_term=_._ag_185568238764_._ad_769543047741_._kw_&utm_content=g&funnel=&test=&gad_source=1&gad_campaignid=22894903173&gbraid=0AAAAADROdO0I1a-xs-CK9E95MbX5k6PAb&gclid=CjwKCAjwx7LSBhB3EiwAjcodxLLo6mglq5_RvXuPsYyaAkZvgb9qJDsK9lqcddI2iCsC8CvnPBab0hoCQX0QAvD_BwE&couponCode=KEEPLEARNING;Coursera
 maven;Maven Crash Course;https://www.udemy.com/course/mavencrashcourse/?utm_campaign=BG-Search_DSA_Beta_Prof_la.EN_cc.ROW-English&utm_source=bing&utm_medium=paid-search&portfolio=Bing-ROW-English&utm_audience=mx&utm_tactic=nb&utm_term=IT+en&utm_content=o&funnel=&test=&msclkid=1aa235bee66a1e0a8ab25cfc5e724791&couponCode=CM251217G2;Udemy
 remote troubleshooting;IT Troubleshooting Skill Training;https://www.udemy.com/course/it-troubleshooting/?utm_campaign=BG-Search_Keyword_Beta_Prof_la.EN_cc.ROW-English&utm_source=bing&utm_medium=paid-search&portfolio=Bing-ROW-English&utm_audience=mx&utm_tactic=nb&utm_term=IT+Troubleshooting+Course&utm_content=o&funnel=&test=&msclkid=39ddb587c42119f288d1dcc57c7daf86&couponCode=CM251217G2;Udemy
 odoo framework;ODOO Technical Training - v7, v8-11;https://www.udemy.com/course/odoo-technical/?utm_campaign=BG-Search_Keyword_Beta_Prof_la.EN_cc.ROW-English&utm_source=bing&utm_medium=paid-search&portfolio=Bing-ROW-English&utm_audience=mx&utm_tactic=nb&utm_term=Odoo+Tutorial&utm_content=o&funnel=&test=&msclkid=26be4060b92c1bc88e3e292201bd9c27&couponCode=CM251217G2;Udemy
@@ -163,3 +162,8 @@ sdlc;2023 SDLC Full Stack Course Spring Boot 3, MongoDB, Docker;https://www.udem
 workflow automation;workflow automation;https://www.coursera.org/learn/workflow-automation-using-generative-ai;Coursera
 erp systems;Managing Enterprise Resource Planning (ERP) Implementation;https://www.udemy.com/course/managing-enterprise-resource-planning-erp-implementation/?couponCode=CM251217G2;Udemy
 deluge scripting;Deluge on a Luge: Learn Zoho Programming;http://udemy.com/course/deluge-on-a-luge-learn-zoho-programming/?couponCode=CM251217G2;Udemy
+php;Modern PHP: The Complete Guide - from Beginner to Advanced;https://www.udemy.com/course/modern-php/;Udemy
+Data Cleaning;Data Cleaning and Preprocessing using Python;https://www.udemy.com/course/data-cleaning-and-preprocessing-using-python/?couponCode=KEEPLEARNING;Udemy
+tableau;Tableau Advanced: Master Tableau in Data Science;https://www.udemy.com/course/tableau10-advanced/?utm_campaign=Search_Keyword_Beta_Prof_la.EN_cc.ROW-English&utm_source=google&utm_medium=paid-search&portfolio=ROW-English&utm_audience=mx&utm_tactic=nb&utm_term=_._ag_164460586041_._ad_696298644938_._kw_tableau+course&utm_content=g&funnel=&test=&gad_source=1&gad_campaignid=21178661965&gbraid=0AAAAADROdO06Kfm6eUC0slR7kg8rPD4zW&gclid=CjwKCAjw6rfSBhAqEiwA_yocpriLvZ5RX7BqODo9VnhJoRum0LLdsP_MHDTOhSzAXrXj62Gik5kuzxoCCSQQAvD_BwE&couponCode=KEEPLEARNING;Udemy
+Visualization;Data Visualization: Theory and Foundations;https://www.udemy.com/course/mastering-data-visualization/?utm_campaign=Search_DSA_Beta_Prof_la.EN_cc.ROW-English_Subs&utm_source=google&utm_medium=paid-search&portfolio=ROW-English&utm_audience=mx&utm_tactic=nb&utm_term=_._ag_185568238724_._ad_769543047735_._kw_&utm_content=g&funnel=&test=&gad_source=1&gad_campaignid=22894903173&gbraid=0AAAAADROdO0Vp-yL_eDpEyn0YcIwxYxR-&gclid=CjwKCAjw6rfSBhAqEiwA_yocpkhtmhiSnR-TzJFc9V6Y1MKDVUu_E3sWdYM2SYjyCPcs8HRZ_AZkvhoCulwQAvD_BwE&couponCode=KEEPLEARNING;Udemy
+ TensorFlow;Complete Guide to TensorFlow for Deep Learning with Python;https://www.udemy.com/course/complete-guide-to-tensorflow-for-deep-learning-with-python/?couponCode=KEEPLEARNING;Udemy
