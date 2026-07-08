@@ -71,6 +71,7 @@ export const MOCK_RECOMMENDATIONS: CareerRecommendation[] = [
         ],
       },
     ],
+    frameworkChoices: [],
   },
   {
     id: "aiml",
@@ -130,6 +131,7 @@ export const MOCK_RECOMMENDATIONS: CareerRecommendation[] = [
         ],
       },
     ],
+    frameworkChoices: [],
   },
   {
     id: "devops",
@@ -189,5 +191,6 @@ export const MOCK_RECOMMENDATIONS: CareerRecommendation[] = [
         ],
       },
     ],
+    frameworkChoices: [],
   },
 ];
