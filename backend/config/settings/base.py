@@ -2,6 +2,7 @@
 Shared Django settings — import from ``dev`` or ``prod``.
 """
 
+from datetime import timedelta
 from pathlib import Path
 import os
 
@@ -34,6 +35,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -84,6 +86,8 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "accounts.User"
 
@@ -107,3 +111,15 @@ _origins_raw = os.environ.get(
 CORS_ALLOWED_ORIGINS = [
     o.strip() for o in _origins_raw.split(",") if o.strip()
 ]
+
+SIMPLE_JWT = {
+    # Access token is valid for 1 day — no more surprise logouts mid-session.
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+    # Refresh token is valid for 30 days — user stays logged in across browser restarts.
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
+    # Issue a new refresh token each time the access token is refreshed,
+    # so an active user's session never expires.
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": False,
+    "UPDATE_LAST_LOGIN": True,
+}

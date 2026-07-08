@@ -82,7 +82,8 @@ def split_frameworks(cell: str) -> list[str]:
 
 class Command(BaseCommand):
     help = (
-        "Load catalog data from CSV files in data/seed (idempotent upsert per job URL/title)."
+        "Load catalog data from CSV files in data/seed (idempotent upsert per job URL/title). "
+        "Use --reset to delete and reseed only courses data from Courses.csv."
     )
 
     def add_arguments(self, parser):
@@ -90,6 +91,14 @@ class Command(BaseCommand):
             "--purge",
             action="store_true",
             help="Delete all catalog rows before seeding.",
+        )
+        parser.add_argument(
+            "--reset",
+            action="store_true",
+            help=(
+                "Delete all existing Course and CourseSkill records, then reseed "
+                "only from Courses.csv. Other catalog data (jobs, skills) is untouched."
+            ),
         )
         parser.add_argument(
             "--seed-dir",
@@ -103,6 +112,25 @@ class Command(BaseCommand):
         seed_dir = seed_dir.resolve()
         if not seed_dir.is_dir():
             raise CommandError(f"Seed directory not found: {seed_dir}")
+
+        # --reset: only reseed courses
+        if options["reset"]:
+            courses_csv = seed_dir / DEFAULT_FILENAMES["courses"]
+            if not courses_csv.is_file():
+                raise CommandError(
+                    f"Courses CSV file not found: {courses_csv}"
+                )
+            with transaction.atomic():
+                self._reset_courses()
+                distinct_urls, new_cs_links = self._seed_courses(courses_csv)
+            self.stdout.write(
+                self.style.SUCCESS(
+                    "Courses reset complete. "
+                    f"Distinct course URLs in CSV: {distinct_urls}; "
+                    f"course-to-skill links created: {new_cs_links}."
+                )
+            )
+            return
 
         jobs_skills = seed_dir / DEFAULT_FILENAMES["jobs_skills"]
         jobs_csv = seed_dir / DEFAULT_FILENAMES["jobs"]
@@ -140,6 +168,16 @@ class Command(BaseCommand):
         Job.objects.all().delete()
         Skill.objects.all().delete()
         self.stdout.write(self.style.WARNING("Catalog tables emptied (--purge)."))
+
+    def _reset_courses(self) -> None:
+        """Delete all CourseSkill and Course records, leaving jobs and skills intact."""
+        cs_count, _ = CourseSkill.objects.all().delete()
+        c_count, _ = Course.objects.all().delete()
+        self.stdout.write(
+            self.style.WARNING(
+                f"Courses reset: deleted {c_count} course(s) and {cs_count} course-skill link(s)."
+            )
+        )
 
     def _get_or_create_skill(self, label: str) -> tuple[Skill, bool]:
         return Skill.objects.get_or_create(name=label)
@@ -221,7 +259,7 @@ class Command(BaseCommand):
 
     def _seed_courses(self, path: Path) -> tuple[int, int]:
         cs_created = 0
-        with path.open(newline="", encoding="utf-8-sig") as fh:
+        with path.open(newline="", encoding="utf-8-sig", errors="replace") as fh:
             reader = csv.DictReader(fh, delimiter=";")
             expected = {"skill", "course_name", "link", "platform"}
             if reader.fieldnames:
