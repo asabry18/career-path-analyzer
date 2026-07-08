@@ -83,21 +83,39 @@ def split_frameworks(cell: str) -> list[str]:
 class Command(BaseCommand):
     help = (
         "Load catalog data from CSV files in data/seed (idempotent upsert per job URL/title). "
-        "Use --reset to delete and reseed only courses data from Courses.csv."
+        "Use --reset to reseed Courses.csv, --reset-jobs to reseed jobs_with_sector.csv, "
+        "or --reset-all to reseed both at once."
     )
 
     def add_arguments(self, parser):
         parser.add_argument(
             "--purge",
             action="store_true",
-            help="Delete all catalog rows before seeding.",
+            help="Delete ALL catalog rows (jobs, courses, skills) then reseed everything.",
         )
         parser.add_argument(
             "--reset",
             action="store_true",
             help=(
-                "Delete all existing Course and CourseSkill records, then reseed "
-                "only from Courses.csv. Other catalog data (jobs, skills) is untouched."
+                "Delete all Course and CourseSkill records, then reseed "
+                "only from Courses.csv. Jobs and skills are untouched."
+            ),
+        )
+        parser.add_argument(
+            "--reset-jobs",
+            action="store_true",
+            help=(
+                "Delete all Job, JobSkill, and JobFrameworkAlternative records, then reseed "
+                "only from jobs_with_sector.csv. Courses and skills are untouched."
+            ),
+        )
+        parser.add_argument(
+            "--reset-all",
+            action="store_true",
+            help=(
+                "Delete all Job, JobSkill, JobFrameworkAlternative, Course, and CourseSkill "
+                "records, then reseed from both jobs_with_sector.csv and Courses.csv. "
+                "Skills table is preserved."
             ),
         )
         parser.add_argument(
@@ -117,15 +135,55 @@ class Command(BaseCommand):
         if options["reset"]:
             courses_csv = seed_dir / DEFAULT_FILENAMES["courses"]
             if not courses_csv.is_file():
-                raise CommandError(
-                    f"Courses CSV file not found: {courses_csv}"
-                )
+                raise CommandError(f"Courses CSV file not found: {courses_csv}")
             with transaction.atomic():
                 self._reset_courses()
                 distinct_urls, new_cs_links = self._seed_courses(courses_csv)
             self.stdout.write(
                 self.style.SUCCESS(
                     "Courses reset complete. "
+                    f"Distinct course URLs in CSV: {distinct_urls}; "
+                    f"course-to-skill links created: {new_cs_links}."
+                )
+            )
+            return
+
+        # --reset-jobs: only reseed jobs
+        if options["reset_jobs"]:
+            jobs_csv = seed_dir / DEFAULT_FILENAMES["jobs"]
+            if not jobs_csv.is_file():
+                raise CommandError(f"Jobs CSV file not found: {jobs_csv}")
+            with transaction.atomic():
+                self._reset_jobs()
+                job_count, link_count, fw_count = self._seed_jobs(jobs_csv)
+            self.stdout.write(
+                self.style.SUCCESS(
+                    "Jobs reset complete. "
+                    f"Jobs seeded: {job_count}; skill links written: {link_count}; "
+                    f"framework alternative rows written: {fw_count}."
+                )
+            )
+            return
+
+        # --reset-all: reseed both jobs and courses (skills preserved)
+        if options["reset_all"]:
+            jobs_csv = seed_dir / DEFAULT_FILENAMES["jobs"]
+            courses_csv = seed_dir / DEFAULT_FILENAMES["courses"]
+            missing = [p.name for p in (jobs_csv, courses_csv) if not p.is_file()]
+            if missing:
+                raise CommandError(
+                    "Missing CSV file(s): " + ", ".join(missing) + f" under {seed_dir}"
+                )
+            with transaction.atomic():
+                self._reset_courses()
+                self._reset_jobs()
+                job_count, link_count, fw_count = self._seed_jobs(jobs_csv)
+                distinct_urls, new_cs_links = self._seed_courses(courses_csv)
+            self.stdout.write(
+                self.style.SUCCESS(
+                    "Full reset complete (skills preserved). "
+                    f"Jobs seeded: {job_count}; skill links written: {link_count}; "
+                    f"framework alternative rows written: {fw_count}. "
                     f"Distinct course URLs in CSV: {distinct_urls}; "
                     f"course-to-skill links created: {new_cs_links}."
                 )
@@ -176,6 +234,18 @@ class Command(BaseCommand):
         self.stdout.write(
             self.style.WARNING(
                 f"Courses reset: deleted {c_count} course(s) and {cs_count} course-skill link(s)."
+            )
+        )
+
+    def _reset_jobs(self) -> None:
+        """Delete all Job, JobSkill, and JobFrameworkAlternative records, leaving courses and skills intact."""
+        fw_count, _ = JobFrameworkAlternative.objects.all().delete()
+        js_count, _ = JobSkill.objects.all().delete()
+        j_count, _ = Job.objects.all().delete()
+        self.stdout.write(
+            self.style.WARNING(
+                f"Jobs reset: deleted {j_count} job(s), {js_count} job-skill link(s), "
+                f"and {fw_count} framework alternative row(s)."
             )
         )
 
