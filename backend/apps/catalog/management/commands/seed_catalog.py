@@ -80,6 +80,43 @@ def split_frameworks(cell: str) -> list[str]:
     return labels
 
 
+# ---------------------------------------------------------------------------
+# Sector inference — used when the CSV has no Sector column.
+# Maps lowercase title keywords → sector name.
+# ---------------------------------------------------------------------------
+_SECTOR_KEYWORDS: list[tuple[list[str], str]] = [
+    # Data / AI / Analytics
+    (["data scientist", "data analyst", "data engineer", "machine learning", "ml engineer",
+      "ai engineer", "ai automation", "deep learning", "nlp", "business intelligence",
+      "bi developer", "analytics", "computer vision", "sql developer", "oracle developer",
+      "database"], "Data"),
+    # Network / Infrastructure / Security / IT Ops
+    (["network", "sysadmin", "system admin", "it support", "helpdesk", "cloud engineer",
+      "devops", "site reliability", "sre", "infrastructure", "security engineer",
+      "cybersecurity", "penetration", "linux", "windows admin", "application support",
+      "desktop support", "desktop developer"], "Network"),
+    # Software / Web / Mobile / Design / Management
+    (["frontend", "front-end", "front end", "backend", "back-end", "back end",
+      "full stack", "fullstack", "web developer", "mobile developer", "android",
+      "ios developer", "software engineer", "software developer", "software tester",
+      "react", "angular", "vue", "node", "django", "laravel", "spring", "flutter",
+      "ui ux", "ui/ux", "ux designer", "ui developer", "ux developer",
+      "product manager", "project manager", "scrum", "agile", "qa engineer",
+      "test engineer", "automation engineer", "embedded", "game developer",
+      "drupal", "wordpress", "sharepoint", "erp developer", "sap developer",
+      "odoo", "zoho", "plm developer", "business developer", "audit"], "Software"),
+]
+
+
+def infer_sector(title: str) -> str | None:
+    """Return a sector name inferred from the job title, or None if unknown."""
+    lower = title.lower()
+    for keywords, sector in _SECTOR_KEYWORDS:
+        if any(kw in lower for kw in keywords):
+            return sector
+    return None
+
+
 class Command(BaseCommand):
     help = (
         "Load catalog data from CSV files in data/seed (idempotent upsert per job URL/title). "
@@ -293,7 +330,10 @@ class Command(BaseCommand):
                 description = "\n".join(description_parts)
 
                 skills = parse_skills_list(row.get("skills", ""))
+                # Use sector from CSV if present, otherwise infer from job title.
                 sector = parse_sector(row.get("Sector") or row.get("sector") or "")
+                if not sector:
+                    sector = infer_sector(title)
 
                 job, _ = Job.objects.update_or_create(
                     title=title,
